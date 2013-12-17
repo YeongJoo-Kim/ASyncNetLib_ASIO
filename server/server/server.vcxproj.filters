@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="소스 파일\AsioWrapper">
+      <UniqueIdentifier>{413077fd-e654-49f9-944b-b3de3ec00848}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\AsioWrapper">
+      <UniqueIdentifier>{ada90a5b-607b-4dec-9758-132905bfbd73}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -24,17 +30,17 @@
     <ClInclude Include="targetver.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="AsyncTcpServer.hpp">
+    <ClInclude Include="Server.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="AsyncConnection.hpp">
-      <Filter>헤더 파일</Filter>
+      <Filter>헤더 파일\AsioWrapper</Filter>
     </ClInclude>
     <ClInclude Include="AsyncConnectionManager.hpp">
-      <Filter>헤더 파일</Filter>
+      <Filter>헤더 파일\AsioWrapper</Filter>
     </ClInclude>
-    <ClInclude Include="Server.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="AsyncTcpServer.hpp">
+      <Filter>헤더 파일\AsioWrapper</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

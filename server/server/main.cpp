@@ -1,9 +1,8 @@
 #include "stdafx.h"
-#include "SyncServer.h"
+#include "Server.h"
 
 // 콘솔 컨트롤 핸들러가 호출할 함수
 boost::function0<void> console_ctrl_function;
-
 BOOL WINAPI console_ctrl_handler(DWORD ctrl_type)
 {
 	switch (ctrl_type)
@@ -23,7 +22,7 @@ BOOL WINAPI console_ctrl_handler(DWORD ctrl_type)
 int main(int argc, char* argv[])
 {
 
- 	CSyncServer Server;
+ 	Server server;
  
  	try
  	{
@@ -35,7 +34,7 @@ int main(int argc, char* argv[])
  
  		
  
- 		Server.Begin(atoi(argv[1]));
+ 		server.Begin(atoi(argv[1]));
  	}
  	catch (std::exception& e)
  	{

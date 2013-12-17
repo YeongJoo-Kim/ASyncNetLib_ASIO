@@ -76,7 +76,10 @@ private:
 		{
 			if (!ec)
 			{
-				std::make_shared<AsyncConnection>(std::move(mSocket))->start();
+				AsyncConnect_ptr session = std::make_shared<AsyncConnection>(std::move(mSocket));
+
+				m_ConnectionManager.start(session);
+
 			}
 
 			do_accept();
@@ -99,7 +102,6 @@ private:
 
 	AsyncConnectionManager		m_ConnectionManager;
 
-	
 
 	tcp::acceptor	mAcceptor;
 	tcp::socket		mSocket;

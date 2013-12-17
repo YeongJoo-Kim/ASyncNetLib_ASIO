@@ -1,19 +1,20 @@
 #define BOOST_ASIO_HAS_MOVE
 #include <boost/asio.hpp>
 #include <boost/array.hpp>
- 
+
 using boost::asio::ip::tcp;
 class AsyncConnection : public std::enable_shared_from_this<AsyncConnection>
 {
 public:
 	AsyncConnection(tcp::socket socket)
 		: mSocket(std::move(socket))
+		//, mConnectionManager(manager)
+
 	{
 	};
 
 	void start()
 	{
-		//room_.join(shared_from_this());
 		do_read();
 	}
 
@@ -94,9 +95,11 @@ private:
 	}
 
 
-
+	//AsyncConnectionManager& mConnectionManager;
 	boost::asio::ip::tcp::socket mSocket;
 	enum { max_length = 1024 };
 	unsigned char data_[max_length];
 	boost::array<unsigned char, 8192> _buffer;
 };
+
+typedef std::shared_ptr<AsyncConnection> AsyncConnect_ptr;
