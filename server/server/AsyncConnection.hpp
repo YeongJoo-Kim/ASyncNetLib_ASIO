@@ -3,18 +3,28 @@
 #include <boost/array.hpp>
 
 using boost::asio::ip::tcp;
+
 class AsyncConnection : public std::enable_shared_from_this<AsyncConnection>
 {
+	
+
 public:
 	AsyncConnection(tcp::socket socket)
 		: mSocket(std::move(socket))
-		//, mConnectionManager(manager)
 
 	{
+		boost::system::error_code ec;
+		tcp::endpoint endpoint = mSocket.remote_endpoint(ec);
+		if (!ec)
+		{
+			mRemoteAddress = endpoint.address().to_string(ec);
+			mRemotePortNum = endpoint.port();
+		}
 	};
 
 	void start()
 	{
+
 		do_read();
 	}
 
@@ -96,9 +106,13 @@ private:
 
 
 	//AsyncConnectionManager& mConnectionManager;
+	std::string		mRemoteAddress;
+	uint16_t		mRemotePortNum;
 	boost::asio::ip::tcp::socket mSocket;
+
 	enum { max_length = 1024 };
 	unsigned char data_[max_length];
+	
 	boost::array<unsigned char, 8192> _buffer;
 };
 

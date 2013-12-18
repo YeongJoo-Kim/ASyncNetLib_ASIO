@@ -10,6 +10,10 @@ public:
 	~Server(void);
 
 	bool Begin(unsigned short nPort = 3333);
+	void OnAccept()
+	{
+
+	};
 
 	void WriteAll()
 	{

@@ -20,6 +20,8 @@ bool Server::Begin(unsigned short nPort)
 
 	AsyncTcpServer s(ioService, nPort);
 
+//	s.delegate_accept += &OnAccept;
+
 	ioService.run();
 
 	return true;

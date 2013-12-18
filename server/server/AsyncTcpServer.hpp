@@ -21,6 +21,7 @@
 #include <boost/thread/mutex.hpp>
 
 
+
 #include "AsyncConnectionManager.hpp"
 
 using boost::asio::ip::tcp;
@@ -78,8 +79,9 @@ private:
 			{
 				AsyncConnect_ptr session = std::make_shared<AsyncConnection>(std::move(mSocket));
 
-				m_ConnectionManager.start(session);
+				m_ConnectionManager.begin(session);
 
+				//call callback OnAccept(session);
 			}
 
 			do_accept();
@@ -88,6 +90,8 @@ private:
 		return 0;
 
 	};
+
+
 
 	bool WriteAll(unsigned char* buffer, int len)
 	{
@@ -110,4 +114,6 @@ private:
 	//boost::asio::io_service & ioService;
 
 	boost::mutex listening_mutex_;
+
+//	delegate  delegate_accept;
 };

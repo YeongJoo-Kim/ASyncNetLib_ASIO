@@ -5,7 +5,7 @@ using boost::asio::ip::tcp;
 class AsyncConnectionManager : public std::enable_shared_from_this<AsyncConnectionManager>
 {
 public:
-	void start(AsyncConnect_ptr session)
+	void begin(AsyncConnect_ptr session)
 	{
 		mConnections.insert(session);
 
@@ -16,8 +16,10 @@ public:
 
 	void stop(AsyncConnect_ptr session)
 	{
-		mConnections.erase(session);
 		session->stop();
+
+		mConnections.erase(session);
+		
 	}
 
 	void stop_all()
