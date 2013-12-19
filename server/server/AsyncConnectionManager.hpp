@@ -34,6 +34,15 @@ public:
 		mConnections.clear();
 	}
 	
+	void WriteAll(unsigned char* buffer, unsigned int len)
+	{
+		std::for_each(mConnections.begin(), mConnections.end(), [this](AsyncConnect_ptr connection)
+		{
+			//connection->
+		}
+		);
+
+	}
 private:
 
 	std::set<AsyncConnect_ptr> mConnections;

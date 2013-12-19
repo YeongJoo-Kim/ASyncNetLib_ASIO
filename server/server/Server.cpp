@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "Server.h"
-
+//#include<boost/tokenizer.hpp>
 
 Server::Server(void)
 	//:m_nPort(3333)
@@ -23,6 +23,6 @@ bool Server::Begin(unsigned short nPort)
 //	s.delegate_accept += &OnAccept;
 
 	ioService.run();
-
+	
 	return true;
 }

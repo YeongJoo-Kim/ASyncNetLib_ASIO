@@ -1,6 +1,9 @@
 #define BOOST_ASIO_HAS_MOVE
+#include <iostream>
+
 #include <boost/asio.hpp>
 #include <boost/array.hpp>
+
 
 using boost::asio::ip::tcp;
 
@@ -35,73 +38,38 @@ public:
 
 
 private:
+
 	void do_read()
 	{
-/*
 		auto self(shared_from_this());
-		boost::asio::async_read(mSocket, boost::asio::buffer(read_msg_.data(), chat_message::header_length), [this, self](boost::system::error_code ec, std::size_t / *length* /)
-		{
-			if (!ec && read_msg_.decode_header())
-			{
-				do_read_body();
-			}
-			else
-			{
-				room_.leave(shared_from_this());
-			}
-		});*/
-	}
 
-	void do_read_body()
-	{
-/*
-		auto self(shared_from_this());
-		boost::asio::async_read(mSocket, boost::asio::buffer(read_msg_.body(), read_msg_.body_length()), [this, self](boost::system::error_code ec, std::size_t / *length* /)
+		memset(data_, 0x00, max_length);
+
+		mSocket.async_read_some(boost::asio::buffer(data_, max_length), [this, self](boost::system::error_code ec, std::size_t length)
 		{
 			if (!ec)
 			{
-				room_.deliver(read_msg_);
-				do_read_header();
+				std::cout << (char*)data_ << std::endl;
+
+				do_read();
 			}
-			else
-			{
-				room_.leave(shared_from_this());
-			}
-		});*/
+		});
 	}
 
-/*	void deliver(const chat_message& msg)
-	{
 
-		bool write_in_progress = !write_msgs_.empty();
-		write_msgs_.push_back(msg);
-		if (!write_in_progress)
-		{
-			do_write();
-		}
-	}
-*/
-	//void write(const )
 
-	void do_write()
+
+	void do_write(unsigned char* buffer, std::size_t length)
 	{
-/*
 		auto self(shared_from_this());
-		boost::asio::async_write(mSocket, boost::asio::buffer(write_msgs_.front().data(), write_msgs_.front().length()), [this, self](boost::system::error_code ec, std::size_t / *length* /)
+
+		boost::asio::async_write(mSocket, boost::asio::buffer(buffer, length), [this, self](boost::system::error_code ec, std::size_t /*length*/)
 		{
 			if (!ec)
 			{
-				write_msgs_.pop_front();
-				if (!write_msgs_.empty())
-				{
-					do_write();
-				}
+				
 			}
-			else
-			{
-				//room_.leave(shared_from_this());
-			}
-		});*/
+		});
 	}
 
 

@@ -37,38 +37,6 @@ public:
 	};
 
 
-/*
-	void run() {
-		start_listening();
-		ioService.run();
-	};
-
-
-
-	void start_listening()
-	{
-		using boost::asio::ip::tcp;
-
-		boost::system::error_code error;
-		boost::unique_lock<boost::mutex> listening_lock(listening_mutex_);
-
-		mAcceptor.listen(boost::asio::socket_base::max_connections, error);
-
-		mAcceptor.async_accept(mSocket, [this](boost::system::error_code ec)
-		{
-			if (!ec)
-			{
-				std::shared_ptr<AsyncConnection> connection = std::make_shared<AsyncConnection>(std::move(mSocket));
-				connection->Begin();
-				m_Connections.insert(connection);
-			}
-
-			DoAccept();
-		});
-
-
-	}*/
-
 
 private:
 	int  do_accept()
@@ -79,7 +47,7 @@ private:
 			{
 				AsyncConnect_ptr session = std::make_shared<AsyncConnection>(std::move(mSocket));
 
-				m_ConnectionManager.begin(session);
+				mConnectionManager.begin(session);
 
 				//call callback OnAccept(session);
 			}
@@ -101,10 +69,12 @@ private:
 		}
 		);
 		*/
+
+		mConnectionManager.WriteAll(buffer, len);
 		return true;
 	}
 
-	AsyncConnectionManager		m_ConnectionManager;
+	AsyncConnectionManager		mConnectionManager;
 
 
 	tcp::acceptor	mAcceptor;
