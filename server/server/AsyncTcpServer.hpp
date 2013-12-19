@@ -45,7 +45,7 @@ private:
 		{
 			if (!ec)
 			{
-				AsyncConnect_ptr session = std::make_shared<AsyncConnection>(std::move(mSocket));
+				AsyncTcpConnect_ptr session = std::make_shared<AsyncTcpConnection>(std::move(mSocket));
 
 				mConnectionManager.begin(session);
 

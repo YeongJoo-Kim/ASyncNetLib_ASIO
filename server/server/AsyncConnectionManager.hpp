@@ -1,11 +1,11 @@
 #define BOOST_ASIO_HAS_MOVE
-#include "AsyncConnection.hpp"
+#include "AsyncTcpConnection.hpp"
 
 using boost::asio::ip::tcp;
 class AsyncConnectionManager : public std::enable_shared_from_this<AsyncConnectionManager>
 {
 public:
-	void begin(AsyncConnect_ptr session)
+	void begin(AsyncTcpConnect_ptr session)
 	{
 		mConnections.insert(session);
 
@@ -14,7 +14,7 @@ public:
 		
 	}
 
-	void stop(AsyncConnect_ptr session)
+	void stop(AsyncTcpConnect_ptr session)
 	{
 		session->stop();
 
@@ -25,7 +25,7 @@ public:
 	void stop_all()
 	{
 		// 모든 connection::stop를 수행함
-		std::for_each(mConnections.begin(), mConnections.end(), [this](AsyncConnect_ptr connection)
+		std::for_each(mConnections.begin(), mConnections.end(), [this](AsyncTcpConnect_ptr connection)
 			{
 				connection->stop();
 			}
@@ -36,14 +36,14 @@ public:
 	
 	void WriteAll(unsigned char* buffer, unsigned int len)
 	{
-		std::for_each(mConnections.begin(), mConnections.end(), [this](AsyncConnect_ptr connection)
+		std::for_each(mConnections.begin(), mConnections.end(), [this](AsyncTcpConnect_ptr connection)
 		{
-			//connection->
+			//connection->Write(buffer, len);
 		}
 		);
 
 	}
 private:
 
-	std::set<AsyncConnect_ptr> mConnections;
+	std::set<AsyncTcpConnect_ptr> mConnections;
 };

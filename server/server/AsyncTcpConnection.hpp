@@ -7,12 +7,12 @@
 
 using boost::asio::ip::tcp;
 
-class AsyncConnection : public std::enable_shared_from_this<AsyncConnection>
+class AsyncTcpConnection : public std::enable_shared_from_this<AsyncTcpConnection>
 {
 	
 
 public:
-	AsyncConnection(tcp::socket socket)
+	AsyncTcpConnection(tcp::socket socket)
 		: mSocket(std::move(socket))
 
 	{
@@ -84,4 +84,4 @@ private:
 	boost::array<unsigned char, 8192> _buffer;
 };
 
-typedef std::shared_ptr<AsyncConnection> AsyncConnect_ptr;
+typedef std::shared_ptr<AsyncTcpConnection> AsyncTcpConnect_ptr;

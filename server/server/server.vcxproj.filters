@@ -33,13 +33,13 @@
     <ClInclude Include="Server.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="AsyncConnection.hpp">
-      <Filter>헤더 파일\AsioWrapper</Filter>
-    </ClInclude>
     <ClInclude Include="AsyncConnectionManager.hpp">
       <Filter>헤더 파일\AsioWrapper</Filter>
     </ClInclude>
     <ClInclude Include="AsyncTcpServer.hpp">
+      <Filter>헤더 파일\AsioWrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="AsyncTcpConnection.hpp">
       <Filter>헤더 파일\AsioWrapper</Filter>
     </ClInclude>
   </ItemGroup>

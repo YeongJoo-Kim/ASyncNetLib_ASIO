@@ -151,7 +151,7 @@
   <ItemGroup>
     <ClInclude Include="AsyncConnectionManager.hpp" />
     <ClInclude Include="AsyncTcpServer.hpp" />
-    <ClInclude Include="AsyncConnection.hpp" />
+    <ClInclude Include="AsyncTcpConnection.hpp" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Server.h" />
     <ClInclude Include="targetver.h" />
