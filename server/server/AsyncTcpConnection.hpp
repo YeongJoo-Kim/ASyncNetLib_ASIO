@@ -59,7 +59,7 @@ private:
 
 
 
-	void do_write(unsigned char* buffer, std::size_t length)
+	bool do_write(unsigned char* buffer, std::size_t length)
 	{
 		auto self(shared_from_this());
 
@@ -67,9 +67,11 @@ private:
 		{
 			if (!ec)
 			{
-				
+				return false;
 			}
 		});
+
+		return true;
 	}
 
 

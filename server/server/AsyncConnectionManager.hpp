@@ -43,6 +43,15 @@ public:
 		);
 
 	}
+
+	bool Write(AsyncTcpConnect_ptr session, unsigned char* buffer, int len)
+	{
+		AsyncTcpConnect_ptr _session = mConnections[session];
+
+		if(_session == mConnections.end()) return false;
+
+		return _session->do_write(buffer, len);
+	}
 private:
 
 	std::set<AsyncTcpConnect_ptr> mConnections;

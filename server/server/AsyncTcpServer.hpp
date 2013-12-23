@@ -30,16 +30,16 @@ class AsyncTcpServer
 {
 public:
 	AsyncTcpServer(boost::asio::io_service& ioService, short nPort) :
-		mSocket(ioService)
-		, mAcceptor(ioService, tcp::endpoint(tcp::v4(), nPort))
+		mSocket(ioService), 
+		mAcceptor(ioService, tcp::endpoint(tcp::v4(), nPort))
 	{
-		do_accept();
+		DoAccept();
 	};
 
 
 
 private:
-	int  do_accept()
+	int  DoAccept()
 	{
 		mAcceptor.async_accept(mSocket, [this](boost::system::error_code ec)
 		{
@@ -48,29 +48,30 @@ private:
 				AsyncTcpConnect_ptr session = std::make_shared<AsyncTcpConnection>(std::move(mSocket));
 
 				mConnectionManager.begin(session);
-
 				//call callback OnAccept(session);
 			}
 
-			do_accept();
+			DoAccept();
 		});
 
 		return 0;
-
 	};
 
-
-
-	bool WriteAll(unsigned char* buffer, int len)
+	void WriteAll(unsigned char* buffer, int len)
 	{
-	/*	for_each(m_Connections.begin(), m_Connections.end(), [](std::shared_ptr<AsyncConnection> connection) 
-		{ 
-			//connection->Write(buffer, len);
-		}
-		);
-		*/
-
 		mConnectionManager.WriteAll(buffer, len);
+
+		return;
+	}
+
+	bool Write(AsyncTcpConnect_ptr session, unsigned char* buffer, int len)
+	{
+		return mConnectionManager.Write(session, buffer, len_);
+	}
+
+	bool Recv(AsyncTcpConnect_ptr session, unsigned char* buffer, int len)
+	{
+
 		return true;
 	}
 
