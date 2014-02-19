@@ -19,6 +19,8 @@
 #include <set>
 #include <boost/asio.hpp>
 #include <boost/thread/mutex.hpp>
+#include <boost/function.hpp>
+
 
 
 
@@ -38,6 +40,9 @@ public:
 
 
 
+	//delegate functions 
+	boost::function<void (void)>	delegate_accept;
+
 private:
 	int  DoAccept()
 	{
@@ -48,7 +53,9 @@ private:
 				AsyncTcpConnect_ptr session = std::make_shared<AsyncTcpConnection>(std::move(mSocket));
 
 				mConnectionManager.begin(session);
-				//call callback OnAccept(session);
+
+				delegate_accept();
+
 			}
 
 			DoAccept();
@@ -66,7 +73,7 @@ private:
 
 	bool Write(AsyncTcpConnect_ptr session, unsigned char* buffer, int len)
 	{
-		return mConnectionManager.Write(session, buffer, len_);
+		return mConnectionManager.Write(session, buffer, len);
 	}
 
 	bool Recv(AsyncTcpConnect_ptr session, unsigned char* buffer, int len)
@@ -76,15 +83,15 @@ private:
 	}
 
 	AsyncConnectionManager		mConnectionManager;
-
-
 	tcp::acceptor	mAcceptor;
 	tcp::socket		mSocket;
-	
+
 	//std::shared_ptr<boost::asio::io_service> self_service_;
 	//boost::asio::io_service & ioService;
 
 	boost::mutex listening_mutex_;
+
+
 
 //	delegate  delegate_accept;
 };

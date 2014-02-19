@@ -12,6 +12,7 @@ Server::~Server(void)
 {
 }
 
+
 bool Server::Begin(unsigned short nPort)
 {
 
@@ -21,7 +22,7 @@ bool Server::Begin(unsigned short nPort)
 	AsyncTcpServer s(ioService, nPort);
 
 //	s.delegate_accept += &OnAccept;
-
+	s.delegate_accept = boost::bind(&Server::OnAccept, *this);
 	ioService.run();
 	
 	return true;

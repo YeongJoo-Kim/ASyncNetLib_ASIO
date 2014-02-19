@@ -62,15 +62,16 @@ private:
 	bool do_write(unsigned char* buffer, std::size_t length)
 	{
 		auto self(shared_from_this());
-
+#if 0
 		boost::asio::async_write(mSocket, boost::asio::buffer(buffer, length), [this, self](boost::system::error_code ec, std::size_t /*length*/)
 		{
 			if (!ec)
 			{
 				return false;
 			}
-		});
 
+		});
+#endif
 		return true;
 	}
 

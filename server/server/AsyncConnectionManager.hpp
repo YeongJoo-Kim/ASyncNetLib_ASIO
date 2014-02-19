@@ -36,21 +36,26 @@ public:
 	
 	void WriteAll(unsigned char* buffer, unsigned int len)
 	{
+		/*
 		std::for_each(mConnections.begin(), mConnections.end(), [this](AsyncTcpConnect_ptr connection)
 		{
 			//connection->Write(buffer, len);
 		}
 		);
+		*/
 
 	}
 
 	bool Write(AsyncTcpConnect_ptr session, unsigned char* buffer, int len)
 	{
-		AsyncTcpConnect_ptr _session = mConnections[session];
+
+/*		AsyncTcpConnect_ptr _session = mConnections[session];
 
 		if(_session == mConnections.end()) return false;
 
 		return _session->do_write(buffer, len);
+		*/
+		return true;
 	}
 private:
 
