@@ -1,8 +1,10 @@
 #pragma once
 #include <iostream>
-
+#include <deque>
 #include <boost/asio.hpp>
 #include <boost/array.hpp>
+#include "../Utils/shared_const_buffer.hpp"
+
 
 
 using boost::asio::ip::tcp;
@@ -36,6 +38,12 @@ public:
 
 	void stop() {
 		_socket.close();
+
+		while (__buffer.empty() == false)
+		{
+			delete[] __buffer.front();
+			__buffer.pop_front();
+		}
 	}
 
 	boost::asio::ip::tcp::socket& Socket() { return _socket; };
@@ -95,7 +103,21 @@ protected:
 		}
 		else
 		{
+			delete[] __buffer.front();
+			__buffer.pop_front();
+
 			on_write_complete(bytes_transferred);
+
+			if (__buffer.empty() == false)
+			{
+				//uint8_t* pData = __buffer.front();
+
+				//PACKET_HEADER* pHeader = (PACKET_HEADER*)pData;
+
+				//do_write(true, pHeader->nSize, pData);
+			}
+
+
 		}
 	}
 
@@ -150,9 +172,30 @@ protected:
 		}
 	}
 
-	bool do_write(unsigned char* buffer, std::size_t length)
+	void do_write(const bool bImmediately, uint8_t* buffer, std::size_t length)
 	{
 		auto self(shared_from_this());
+		
+		uint8_t* pSendData = nullptr;
+		if (bImmediately == false)
+		{
+			pSendData = new uint8_t[length];
+			memcpy(pSendData, buffer, length);
+
+			__buffer.push_back(pSendData);
+		}
+		else
+		{
+			pSendData = buffer;
+		}
+
+
+
+		if (bImmediately == false && __buffer.size() > 1)
+		{
+			return;
+		}
+		
 #if 0
 		boost::asio::async_write(mSocket, boost::asio::buffer(buffer, length), 
 			mStrand.wrap([this, self](boost::system::error_code ec, std::size_t /*length*/)
@@ -163,14 +206,14 @@ protected:
 					}
 				}));
 #endif
-		boost::asio::async_write(_socket, boost::asio::buffer(buffer, length),
+		boost::asio::async_write(_socket, boost::asio::buffer(pSendData, length),
 			mStrand.wrap(boost::bind(
 				&AsyncTcpSessionInterface::__handler_write, 
 				self,
 				boost::asio::placeholders::error,
 				boost::asio::placeholders::bytes_transferred)));
 
-		return true;
+		return;
 	}
 
 
@@ -181,9 +224,13 @@ protected:
 	boost::asio::io_service::strand	mStrand;
 
 	enum { max_length = 1024 };
-	unsigned char data_[max_length];
+	uint8_t data_[max_length];
 	
 	//boost::asio::streambuf data_;
-	std::array<unsigned char, 8192> _buffer;
+	std::array<uint8_t, 8192> _buffer;
+	std::deque<uint8_t*> __buffer;
+	std::deque < std::shared_ptr<boost::asio::const_buffer>> ___buffer;
+
+	boost::asio::streambuf		buffer_write;
 };
 
