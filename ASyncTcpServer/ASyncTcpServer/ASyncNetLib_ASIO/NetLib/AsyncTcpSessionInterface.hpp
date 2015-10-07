@@ -22,8 +22,12 @@ public:
 	
 	std::function<void(AsyncTcpSessionInterface_ptr session)>	delegate_conection_reset_by_peer;
 
-	virtual void on_read() {
+	virtual void on_read_complete() {
 
+	}
+
+	virtual void on_write_complete() {
+	
 	}
 
 	
@@ -64,14 +68,18 @@ protected:
 		mSocket.async_read_some(
 			boost::asio::buffer(data_),
 			mStrand.wrap(boost::bind(
-				&AsyncTcpSessionInterface::__callbakc_recv,
+				&AsyncTcpSessionInterface::__handler_recv,
 				self, 
 				boost::asio::placeholders::error, 
 				boost::asio::placeholders::bytes_transferred)));
 	}
 
+	void __handler_write(const boost::system::error_code& ec)
+	{
+		
+	}
 
-	void __callbakc_recv(const boost::system::error_code& ec, size_t bytes_transferred)
+	void __handler_recv(const boost::system::error_code& ec, size_t bytes_transferred)
 	{
 		if (ec)
 		{
@@ -115,7 +123,7 @@ protected:
 			}
 			*/
 			std::cout << data_;
-			on_read();
+			on_read_complete();
 
 			do_read();
 		}
@@ -125,15 +133,21 @@ protected:
 	{
 		auto self(shared_from_this());
 #if 0
-		boost::asio::async_write(mSocket, boost::asio::buffer(buffer, length), [this, self](boost::system::error_code ec, std::size_t /*length*/)
-		{
-			if (!ec)
-			{
-				return false;
-			}
-
-		});
+		boost::asio::async_write(mSocket, boost::asio::buffer(buffer, length), 
+			mStrand.wrap([this, self](boost::system::error_code ec, std::size_t /*length*/)
+				{
+					if (!ec)
+					{
+						return false;
+					}
+				}));
 #endif
+		boost::asio::async_write(mSocket, boost::asio::buffer(buffer, length),
+			mStrand.wrap(boost::bind(
+				&AsyncTcpSessionInterface::__handler_write,
+				self,
+				boost::asio::placeholders::error)));
+
 		return true;
 	}
 

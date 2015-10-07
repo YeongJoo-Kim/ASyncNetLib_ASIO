@@ -10,7 +10,12 @@ ASyncTcpSession::~ASyncTcpSession()
 {
 	std::cout << "destructor of ASyncTcpSession" << endl;
 }
-void ASyncTcpSession::on_read()
+void ASyncTcpSession::on_read_complete()
 {
-	std::cout << "call on_read" << std::endl;
+	std::cout << "call on_read_complete" << std::endl;
+}
+
+void ASyncTcpSession::on_write_complete()
+{
+	std::cout << "call on_write_complete" << std::endl;
 }

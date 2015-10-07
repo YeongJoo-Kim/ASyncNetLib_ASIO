@@ -1,5 +1,4 @@
 #pragma once
-#define BOOST_NETWORK_DEBUG
 
 #include <SDKDDKVer.h>
 
@@ -78,14 +77,14 @@ protected:
 
 	void listen() {
 		scoped_mutex_lock listening_lock(listening_mutex_);
-		BOOST_NETWORK_MESSAGE("Listening on " << address_ << ':' << port_);
+		NETWORK_MESSAGE("Listening on " << address_ << ':' << port_);
 		if (!listening)
 			start_listening();  // we only initialize our acceptor/sockets if we
 								// arent already listening
 
 			//do_accept();
 		if (!listening) {
-			BOOST_NETWORK_MESSAGE("Error listening on " << address_ << ':' << port_);
+			NETWORK_MESSAGE("Error listening on " << address_ << ':' << port_);
 			boost::throw_exception(
 				std::runtime_error("Error listening on provided port."));
 		}
@@ -141,7 +140,7 @@ protected:
 		scoped_mutex_lock stopping_lock(stopping_mutex_);
 		stopping = false;  // if we were in the process of stopping, we revoke
 						   // that command and continue listening
-		BOOST_NETWORK_MESSAGE("Now listening on socket: '" << address_ << ":" << port_ << "'");
+		NETWORK_MESSAGE("Now listening on socket: '" << address_ << ":" << port_ << "'");
 	}
 
 	
@@ -153,7 +152,7 @@ protected:
 			return; 
 	
 		if (ec) {
-			BOOST_NETWORK_MESSAGE("Error accepting connection, reason: " << ec);
+			NETWORK_MESSAGE("Error accepting connection, reason: " << ec);
 		}
 
 		if (ec) {

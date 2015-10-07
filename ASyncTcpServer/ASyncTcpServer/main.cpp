@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
 
 	//mIo->run();
 
-	SetConsoleCtrlHandler(console_ctrl_handler, TRUE);
+	//SetConsoleCtrlHandler(console_ctrl_handler, TRUE);
 
 	char ch = 0;
 	while (getchar() != 'q')

@@ -13,8 +13,8 @@ class ASyncTcpSession : public AsyncTcpSessionInterface
 public:
 	ASyncTcpSession(boost::asio::io_service& io);
 	~ASyncTcpSession(void);
-	//virtual void __callbakc_recv(const boost::system::error_code& ec, size_t bytes_transferred);
-	virtual void on_read();
+	virtual void on_read_complete();
+	virtual void on_write_complete();
 protected:
 };
 
