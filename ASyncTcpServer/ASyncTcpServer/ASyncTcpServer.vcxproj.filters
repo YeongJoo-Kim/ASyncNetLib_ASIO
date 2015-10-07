@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="소스 파일">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="헤더 파일">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="리소스 파일">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="ASyncNetLib_ASIO">
+      <UniqueIdentifier>{34c65dce-13f2-4830-99d1-d29b6140c5d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ASyncNetLib_ASIO\NetLib">
+      <UniqueIdentifier>{65022fc1-656e-4f52-ac2d-e9ffd86b37c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ASyncNetLib_ASIO\Utils">
+      <UniqueIdentifier>{75ac0549-55d4-45e4-9746-6d5ffed3961d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ASyncTcpServer">
+      <UniqueIdentifier>{f73389f1-b63d-4445-9174-4fc319743719}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ASyncNetLib_ASIO\NetLib\AsyncConnectionManager.hpp">
+      <Filter>ASyncNetLib_ASIO\NetLib</Filter>
+    </ClInclude>
+    <ClInclude Include="ASyncNetLib_ASIO\NetLib\AsyncTcpServerInterface.hpp">
+      <Filter>ASyncNetLib_ASIO\NetLib</Filter>
+    </ClInclude>
+    <ClInclude Include="ASyncNetLib_ASIO\NetLib\AsyncTcpSessionInterface.hpp">
+      <Filter>ASyncNetLib_ASIO\NetLib</Filter>
+    </ClInclude>
+    <ClInclude Include="ASyncNetLib_ASIO\Utils\debug.hpp">
+      <Filter>ASyncNetLib_ASIO\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="ASyncNetLib_ASIO\Utils\Log.hpp">
+      <Filter>ASyncNetLib_ASIO\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="ASyncTcpServer\ASyncTcpServer.h">
+      <Filter>ASyncTcpServer</Filter>
+    </ClInclude>
+    <ClInclude Include="ASyncTcpServer\ASyncTcpSession.h">
+      <Filter>ASyncTcpServer</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ASyncTcpServer\ASyncTcpServer.cpp">
+      <Filter>ASyncTcpServer</Filter>
+    </ClCompile>
+    <ClCompile Include="ASyncTcpServer\ASyncTcpSession.cpp">
+      <Filter>ASyncTcpServer</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
