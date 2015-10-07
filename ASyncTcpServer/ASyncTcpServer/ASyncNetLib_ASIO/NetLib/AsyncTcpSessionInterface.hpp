@@ -14,48 +14,42 @@ class AsyncTcpSessionInterface : public std::enable_shared_from_this<AsyncTcpSes
 public:
 	static AsyncTcpSessionInterface_ptr	create(boost::asio::io_service& io) { return AsyncTcpSessionInterface_ptr(new AsyncTcpSessionInterface(io))->shared_from_this();}
 
-	~AsyncTcpSessionInterface()
-	{
-		std::cout << "destroy AsyncTcpSessionInterface" << std::endl;
-	};
+	~AsyncTcpSessionInterface()	{};
 
 	
 	std::function<void(AsyncTcpSessionInterface_ptr session)>	delegate_conection_reset_by_peer;
 
-	virtual void on_read_complete() {
+	virtual void on_read_complete(unsigned char* buffer, size_t bytes_transferred) {
 
 	}
 
-	virtual void on_write_complete() {
+	virtual void on_write_complete(size_t bytes_transferred) {
 	
 	}
 
 	
 
 
-	void start()
-	{
+	void start() {
 		do_read();
 	}
 
-	void stop()
-	{
-		mSocket.close();
+	void stop() {
+		_socket.close();
 	}
 
-	boost::asio::ip::tcp::socket& Socket() { return mSocket; };
+	boost::asio::ip::tcp::socket& Socket() { return _socket; };
 protected:
 	AsyncTcpSessionInterface(boost::asio::io_service& io)
-		:mStrand(io), mSocket(io)
+		:mStrand(io), _socket(io),
+		delegate_conection_reset_by_peer(nullptr)
 	{
-		delegate_conection_reset_by_peer = nullptr;
-
 		boost::system::error_code ec;
-		tcp::endpoint endpoint = mSocket.remote_endpoint(ec);
+		tcp::endpoint endpoint = _socket.remote_endpoint(ec);
 		if (!ec)
 		{
-			mRemoteAddress = endpoint.address().to_string(ec);
-			mRemotePortNum = endpoint.port();
+			remote_address = endpoint.address().to_string(ec);
+			remote_port_number = endpoint.port();
 		}
 	};
 
@@ -65,7 +59,7 @@ protected:
 		auto self(shared_from_this());
 		memset(data_, 0x00, max_length);
 
-		mSocket.async_read_some(
+		_socket.async_read_some(
 			boost::asio::buffer(data_),
 			mStrand.wrap(boost::bind(
 				&AsyncTcpSessionInterface::__handler_recv,
@@ -74,16 +68,43 @@ protected:
 				boost::asio::placeholders::bytes_transferred)));
 	}
 
-	void __handler_write(const boost::system::error_code& ec)
+	void __handler_write(const boost::system::error_code& ec, size_t bytes_transferred)
 	{
-		
+		if (ec)
+		{
+			if (ec == boost::asio::error::eof || ec == boost::asio::error::connection_reset)
+			{
+				if (delegate_conection_reset_by_peer != nullptr) {
+					delegate_conection_reset_by_peer(shared_from_this());
+				}
+			}
+			else if (ec == boost::asio::error::operation_aborted)
+			{
+				/*	
+				if (mErrorEventHandler != nullptr) {
+					mErrorEventHandler(err.message(), bytesTransferred);
+				}
+				*/
+			}
+			else
+			{
+
+			}
+
+			
+		}
+		else
+		{
+			on_write_complete(bytes_transferred);
+		}
 	}
 
 	void __handler_recv(const boost::system::error_code& ec, size_t bytes_transferred)
 	{
 		if (ec)
 		{
-			if (ec == boost::asio::error::eof)
+			std::cout << ec.message() << std::endl;
+			if (ec == boost::asio::error::eof || ec == boost::asio::error::connection_reset)
 			{
 				if (delegate_conection_reset_by_peer != nullptr) {
 					delegate_conection_reset_by_peer(shared_from_this());
@@ -122,8 +143,8 @@ protected:
 			mReadCompleteEventHandler();
 			}
 			*/
-			std::cout << data_;
-			on_read_complete();
+			
+			on_read_complete(data_, bytes_transferred);
 
 			do_read();
 		}
@@ -142,20 +163,21 @@ protected:
 					}
 				}));
 #endif
-		boost::asio::async_write(mSocket, boost::asio::buffer(buffer, length),
+		boost::asio::async_write(_socket, boost::asio::buffer(buffer, length),
 			mStrand.wrap(boost::bind(
-				&AsyncTcpSessionInterface::__handler_write,
+				&AsyncTcpSessionInterface::__handler_write, 
 				self,
-				boost::asio::placeholders::error)));
+				boost::asio::placeholders::error,
+				boost::asio::placeholders::bytes_transferred)));
 
 		return true;
 	}
 
 
 	//AsyncConnectionManager& mConnectionManager;
-	std::string		mRemoteAddress;
-	uint16_t		mRemotePortNum;
-	boost::asio::ip::tcp::socket mSocket;
+	std::string		remote_address;
+	uint16_t		remote_port_number;
+	boost::asio::ip::tcp::socket _socket;
 	boost::asio::io_service::strand	mStrand;
 
 	enum { max_length = 1024 };

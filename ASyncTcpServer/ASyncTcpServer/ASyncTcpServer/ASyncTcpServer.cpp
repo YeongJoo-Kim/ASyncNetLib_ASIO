@@ -24,7 +24,6 @@ bool ASyncTcpServer::Begin()
 {
 	delegate_accept = std::move(std::bind(&ASyncTcpServer::onAccept, this, std::placeholders::_1));
 	delegate_connection_reset_by_peer = std::move(std::bind(&ASyncTcpServer::onConnectionResetByPeer, this, std::placeholders::_1));
-	//delegate_session_factory = std::move(std::bind(&SyncServer::onSessionFactory, this));
 
 	run();
 
@@ -47,7 +46,7 @@ AsyncTcpSessionInterface_ptr ASyncTcpServer::create_session()
 
 void ASyncTcpServer::onConnectionResetByPeer(AsyncTcpSessionInterface_ptr session)
 {
-	std::cout << "Connection Rest By Peer!! " << endl;
+	std::cout << "Connection Reset By Peer!! " << endl;
 
 };
 #if 0

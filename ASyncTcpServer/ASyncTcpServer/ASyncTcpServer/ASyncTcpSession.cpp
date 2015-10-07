@@ -10,12 +10,14 @@ ASyncTcpSession::~ASyncTcpSession()
 {
 	std::cout << "destructor of ASyncTcpSession" << endl;
 }
-void ASyncTcpSession::on_read_complete()
+void ASyncTcpSession::on_read_complete(unsigned char* buffer, size_t bytes_transferred)
 {
-	std::cout << "call on_read_complete" << std::endl;
+	//std::cout << "on_read_complete : " << buffer << "(" << bytes_transferred << ")" <<std::endl;
+	//std::cout << "on_read_complete : " << "(" << bytes_transferred << ")" << std::endl;
+	do_write(buffer, bytes_transferred);
 }
 
-void ASyncTcpSession::on_write_complete()
+void ASyncTcpSession::on_write_complete(size_t bytes_transferred)
 {
-	std::cout << "call on_write_complete" << std::endl;
+	//std::cout << "call on_write_complete(" << bytes_transferred << ")" << std::endl;
 }
