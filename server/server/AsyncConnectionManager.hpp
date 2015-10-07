@@ -1,11 +1,11 @@
-#pragma once
-#include "AsyncTcpSessionInterface.hpp"
+#define BOOST_ASIO_HAS_MOVE
+#include "AsyncTcpConnection.hpp"
 
 using boost::asio::ip::tcp;
 class AsyncConnectionManager : public std::enable_shared_from_this<AsyncConnectionManager>
 {
 public:
-	void begin(AsyncTcpSessionInterface_ptr session)
+	void begin(AsyncTcpConnect_ptr session)
 	{
 		mConnections.insert(session);
 
@@ -14,7 +14,7 @@ public:
 		
 	}
 
-	void stop(AsyncTcpSessionInterface_ptr session)
+	void stop(AsyncTcpConnect_ptr session)
 	{
 		session->stop();
 
@@ -25,7 +25,7 @@ public:
 	void stop_all()
 	{
 		// 모든 connection::stop를 수행함
-		std::for_each(mConnections.begin(), mConnections.end(), [this](AsyncTcpSessionInterface_ptr connection)
+		std::for_each(mConnections.begin(), mConnections.end(), [this](AsyncTcpConnect_ptr connection)
 			{
 				connection->stop();
 			}
@@ -37,7 +37,7 @@ public:
 	void WriteAll(unsigned char* buffer, unsigned int len)
 	{
 		/*
-		std::for_each(mConnections.begin(), mConnections.end(), [this](AsyncTcpSessionInterface_ptr connection)
+		std::for_each(mConnections.begin(), mConnections.end(), [this](AsyncTcpConnect_ptr connection)
 		{
 			//connection->Write(buffer, len);
 		}
@@ -46,10 +46,10 @@ public:
 
 	}
 
-	bool Write(AsyncTcpSessionInterface_ptr session, unsigned char* buffer, int len)
+	bool Write(AsyncTcpConnect_ptr session, unsigned char* buffer, int len)
 	{
 
-/*		AsyncTcpSessionInterface_ptr _session = mConnections[session];
+/*		AsyncTcpConnect_ptr _session = mConnections[session];
 
 		if(_session == mConnections.end()) return false;
 
@@ -59,5 +59,5 @@ public:
 	}
 private:
 
-	std::set<AsyncTcpSessionInterface_ptr> mConnections;
+	std::set<AsyncTcpConnect_ptr> mConnections;
 };
