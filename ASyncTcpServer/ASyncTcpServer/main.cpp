@@ -18,7 +18,7 @@ BOOL WINAPI console_ctrl_handler(DWORD ctrl_type)
 	case CTRL_C_EVENT:
 	case CTRL_BREAK_EVENT:
 	case CTRL_CLOSE_EVENT:
-	case CTRL_SHUTDOWN_EVENT:
+	case CTRL_SHUTDOWN_EVENT:	
 		// 콘솔에서 다음 컨트롤 타입 이벤트가 생기면 호출된다.
 		console_ctrl_function();
 		return TRUE;

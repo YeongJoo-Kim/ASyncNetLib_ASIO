@@ -22,53 +22,11 @@ public:
 	
 	std::function<void(AsyncTcpSessionInterface_ptr session)>	delegate_conection_reset_by_peer;
 
-	virtual void __callbakc_recv(const boost::system::error_code& ec, size_t bytes_transferred)
-	{
-		if (ec) 
-		{
-			if (ec == boost::asio::error::eof) 
-			{
-				if (delegate_conection_reset_by_peer != nullptr) {
-						delegate_conection_reset_by_peer(shared_from_this());
-				}
-			}
-			else if(ec == boost::asio::error::operation_aborted)
-			{
-			/*	if (mErrorEventHandler != nullptr) {
-					mErrorEventHandler(err.message(), bytesTransferred);
-				}
-			*/
-			}
-			else
-			{
+	virtual void on_read() {
 
-			}
-
-			//error callback...
-		}
-		else 
-		{
-		/*
-			if (mReadEventHandler != nullptr) {
-
-				//std::cout << bytesTransferred << endl;
-				char* data = new char[bytesTransferred + 1]();
-				data[bytesTransferred] = 0;
-				mResponse.commit(bytesTransferred);
-				istream stream(&mResponse);
-				stream.read(data, bytesTransferred);
-				mReadEventHandler(Buffer::create(data, bytesTransferred), this);
-				delete[] data;
-			}
-			if (mReadCompleteEventHandler != nullptr &&
-				mBufferSize > 0 && bytesTransferred < mBufferSize) {
-				mReadCompleteEventHandler();
-			}
-			*/
-			std::cout << data_ ;
-			do_read();
-		}
 	}
+
+	
 
 
 	void start()
@@ -110,24 +68,58 @@ protected:
 				self, 
 				boost::asio::placeholders::error, 
 				boost::asio::placeholders::bytes_transferred)));
-
-
-			/*
-		mSocket.async_read_some(boost::asio::buffer(data_, max_length), [this, self](boost::system::error_code ec, std::size_t length)
-		{
-			//실질적인 콜백 부분을 한다. 에러 처리 후, 에러가 아닐 경우 event handler를 발생 시킨다.
-			if (!ec)
-			{
-				std::cout << (char*)data_ << std::endl;
-
-				do_read();
-			}
-		});
-		*/
 	}
 
 
+	void __callbakc_recv(const boost::system::error_code& ec, size_t bytes_transferred)
+	{
+		if (ec)
+		{
+			if (ec == boost::asio::error::eof)
+			{
+				if (delegate_conection_reset_by_peer != nullptr) {
+					delegate_conection_reset_by_peer(shared_from_this());
+				}
+			}
+			else if (ec == boost::asio::error::operation_aborted)
+			{
+				/*	if (mErrorEventHandler != nullptr) {
+				mErrorEventHandler(err.message(), bytesTransferred);
+				}
+				*/
+			}
+			else
+			{
 
+			}
+
+			//error callback...
+		}
+		else
+		{
+			/*
+			if (mReadEventHandler != nullptr) {
+
+			//std::cout << bytesTransferred << endl;
+			char* data = new char[bytesTransferred + 1]();
+			data[bytesTransferred] = 0;
+			mResponse.commit(bytesTransferred);
+			istream stream(&mResponse);
+			stream.read(data, bytesTransferred);
+			mReadEventHandler(Buffer::create(data, bytesTransferred), this);
+			delete[] data;
+			}
+			if (mReadCompleteEventHandler != nullptr &&
+			mBufferSize > 0 && bytesTransferred < mBufferSize) {
+			mReadCompleteEventHandler();
+			}
+			*/
+			std::cout << data_;
+			on_read();
+
+			do_read();
+		}
+	}
 
 	bool do_write(unsigned char* buffer, std::size_t length)
 	{
