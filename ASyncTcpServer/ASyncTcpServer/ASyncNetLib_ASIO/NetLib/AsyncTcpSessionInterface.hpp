@@ -232,5 +232,6 @@ protected:
 	std::deque < std::shared_ptr<boost::asio::const_buffer>> ___buffer;
 
 	boost::asio::streambuf		buffer_write;
+	boost::asio::streambuf		buffer_receive;
 };
 

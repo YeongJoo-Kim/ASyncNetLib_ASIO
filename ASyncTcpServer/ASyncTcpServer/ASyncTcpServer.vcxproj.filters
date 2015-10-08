@@ -57,6 +57,9 @@
     <ClInclude Include="ASyncTcpServer\ASyncTcpSession.h">
       <Filter>ASyncTcpServer</Filter>
     </ClInclude>
+    <ClInclude Include="ASyncNetLib_ASIO\Utils\shared_const_buffer.hpp">
+      <Filter>ASyncNetLib_ASIO\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
