@@ -10,8 +10,7 @@ class shared_const_buffer {
 public:
 	explicit shared_const_buffer(const std::string &data) : m_data(new std::vector<char>(data.begin(), data.end())),
 		m_buffer(boost::asio::buffer(*m_data)) {}
-	~shared_const_buffer()
-	{}
+	~shared_const_buffer(){}
 public:
 	typedef boost::asio::const_buffer value_type;
 	typedef const boost::asio::const_buffer *const_iterator;
