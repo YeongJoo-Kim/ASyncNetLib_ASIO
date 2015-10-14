@@ -92,9 +92,9 @@ protected:
 			else if (ec == boost::asio::error::connection_reset)
 			{
 				std::cout << "boost::asio::error::connection_reset" << std::endl;
-				if (delegate_conection_reset_by_peer != nullptr) {
-					delegate_conection_reset_by_peer(shared_from_this());
-				}
+				//if (delegate_conection_reset_by_peer != nullptr) {
+				//	delegate_conection_reset_by_peer(shared_from_this());
+				//}
 			}
 			else if (ec == boost::asio::error::operation_aborted)
 			{
