@@ -28,7 +28,7 @@ public:
 	explicit shared_const_buffer(const uint8_t* pData, std::size_t len) : data_(new std::vector<uint8_t>(pData, pData + len)),
 		buffer_(boost::asio::buffer(*data_)),
 		data_length(len){
-			std::cout << "call constructor of shared_const_buffer " << this << std::endl;
+			//std::cout << "call constructor of shared_const_buffer " << this << std::endl;
 	}
 /*
 	shared_const_buffer(const shared_const_buffer& t)
@@ -37,7 +37,7 @@ public:
 	}
 	*/
 	~shared_const_buffer() {
-		std::cout << "call destructor of shared_const_buffer " << this << std::endl;
+		//std::cout << "call destructor of shared_const_buffer " << this << std::endl;
 	}
 public:
 	typedef boost::asio::const_buffer value_type;

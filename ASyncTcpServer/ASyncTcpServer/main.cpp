@@ -52,6 +52,7 @@ int main(int argc, char* argv[])
 	std::shared_ptr<boost::asio::io_service>	mIo = std::shared_ptr<boost::asio::io_service>(new boost::asio::io_service());
 	std::shared_ptr<void>						mIoWork = std::shared_ptr<boost::asio::io_service::work>(new boost::asio::io_service::work(*mIo));
 
+
 	
 	
 	ASyncTcpServer server(*mIo, 20000);
@@ -78,7 +79,10 @@ int main(int argc, char* argv[])
 		std::cerr << "Exception: " << e.what() << "\n";
 	}
 
-	boost::thread thread(boost::bind(&boost::asio::io_service::run, mIo));
+	boost::thread thread_1(boost::bind(&boost::asio::io_service::run, mIo));
+	//boost::thread thread_2(boost::bind(&boost::asio::io_service::run, mIo));
+	//boost::thread thread_3(boost::bind(&boost::asio::io_service::run, mIo));
+	//boost::thread thread_4(boost::bind(&boost::asio::io_service::run, mIo));
 
 	//mIo->run();
 
@@ -101,7 +105,10 @@ int main(int argc, char* argv[])
 	}
 
 	mIo->stop();
-	thread.join();
+	thread_1.join();
+	//thread_2.join();
+	//thread_3.join();
+	//thread_4.join();
 	return 0;
 }
 
