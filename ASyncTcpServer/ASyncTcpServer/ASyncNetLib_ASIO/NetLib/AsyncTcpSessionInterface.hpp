@@ -195,20 +195,6 @@ protected:
 		return;
 	}
 
-	void do_write(shared_const_buffer &_buffer)
-	{
-		auto self(shared_from_this());
-
-		boost::asio::async_write(_socket, _buffer,
-			mStrand.wrap(boost::bind(
-				&AsyncTcpSessionInterface::__handler_write,
-				self,
-				boost::asio::placeholders::error,
-				boost::asio::placeholders::bytes_transferred)));
-
-		return;
-
-	}
 
 	void __handler_write(const boost::system::error_code& ec, size_t bytes_transferred)
 	{
@@ -269,5 +255,22 @@ protected:
 
 	boost::asio::streambuf		buffer_write;
 	boost::asio::streambuf		buffer_receive;
+
+private:
+
+	void do_write(shared_const_buffer &_buffer)
+	{
+		auto self(shared_from_this());
+
+		boost::asio::async_write(_socket, _buffer,
+			mStrand.wrap(boost::bind(
+				&AsyncTcpSessionInterface::__handler_write,
+				self,
+				boost::asio::placeholders::error,
+				boost::asio::placeholders::bytes_transferred)));
+
+		return;
+
+	}
 };
 
