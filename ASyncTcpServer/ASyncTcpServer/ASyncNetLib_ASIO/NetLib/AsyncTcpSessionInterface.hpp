@@ -103,20 +103,21 @@ protected:
 		}
 		else
 		{
-			delete[] __buffer.front();
-			__buffer.pop_front();
+			
+		//	delete[] __buffer.front();
+		//	__buffer.pop_front();
 
 			on_write_complete(bytes_transferred);
-
+			/*
 			if (__buffer.empty() == false)
 			{
 				//uint8_t* pData = __buffer.front();
 
 				//PACKET_HEADER* pHeader = (PACKET_HEADER*)pData;
 
-				//do_write(true, pHeader->nSize, pData);
+				//do_write(pHeader->nSize, pData, true);
 			}
-
+			*/
 
 		}
 	}
@@ -171,8 +172,8 @@ protected:
 			do_read();
 		}
 	}
-
-	void do_write(const bool bImmediately, uint8_t* buffer, std::size_t length)
+#if 0
+	void do_write(uint8_t* buffer, std::size_t length, const bool bImmediately = false)
 	{
 		auto self(shared_from_this());
 		
@@ -215,6 +216,33 @@ protected:
 
 		return;
 	}
+#else
+	void do_write(uint8_t* buffer, std::size_t length, const bool bImmediately = false)
+	{
+		auto self(shared_from_this());
+
+		shared_const_buffer _buffer(buffer, length);
+
+	#if 0
+		boost::asio::async_write(mSocket, boost::asio::buffer(buffer, length),
+			mStrand.wrap([this, self](boost::system::error_code ec, std::size_t /*length*/)
+		{
+			if (!ec)
+			{
+				return false;
+			}
+		}));
+	#endif
+		boost::asio::async_write(_socket, _buffer,
+			mStrand.wrap(boost::bind(
+				&AsyncTcpSessionInterface::__handler_write,
+				self,
+				boost::asio::placeholders::error,
+				boost::asio::placeholders::bytes_transferred)));
+
+		return;
+	}
+#endif
 
 
 	//AsyncConnectionManager& mConnectionManager;

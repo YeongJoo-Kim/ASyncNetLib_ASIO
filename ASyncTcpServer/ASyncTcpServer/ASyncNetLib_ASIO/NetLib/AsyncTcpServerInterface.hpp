@@ -71,20 +71,20 @@ protected:
 		stopping_mutex_(),
 		listening(false),
 		stopping(false),
-		port_(nPort),
+		server_port_number(nPort),
 		address_("localhost")
 	{};
 
 	void listen() {
 		scoped_mutex_lock listening_lock(listening_mutex_);
-		NETWORK_MESSAGE("Listening on " << address_ << ':' << port_);
+		NETWORK_MESSAGE("Listening on " << address_ << ':' << server_port_number);
 		if (!listening)
 			start_listening();  // we only initialize our acceptor/sockets if we
 								// arent already listening
 
 			//do_accept();
 		if (!listening) {
-			NETWORK_MESSAGE("Error listening on " << address_ << ':' << port_);
+			NETWORK_MESSAGE("Error listening on " << address_ << ':' << server_port_number);
 			boost::throw_exception(
 				std::runtime_error("Error listening on provided port."));
 		}
@@ -102,30 +102,30 @@ protected:
 		mIoService.reset();  // this allows repeated cycles of run -> stop ->
 						   // run
 		tcp::resolver resolver(mIoService);
-		tcp::resolver::query query(address_, port_);
+		tcp::resolver::query query(address_, server_port_number);
 		tcp::resolver::iterator endpoint_iterator = resolver.resolve(query, error);
 		if (error) {
-			BOOST_NETWORK_MESSAGE("Error resolving '" << address_ << ':' << port_);
+			BOOST_NETWORK_MESSAGE("Error resolving '" << address_ << ':' << server_port_number);
 			return;
 		}
 		tcp::endpoint endpoint = *endpoint_iterator;
 		mAcceptor.open(endpoint.protocol(), error);
 		if (error) {
 			BOOST_NETWORK_MESSAGE("Error opening socket: " << address_ << ":"
-				<< port_);
+				<< server_port_number);
 			return;
 		}
 		socket_options_base::acceptor_options(mAcceptor);
 		mAcceptor.bind(endpoint, error);
 		if (error) {
 			BOOST_NETWORK_MESSAGE("Error binding socket: " << address_ << ":"
-				<< port_);
+				<< server_port_number);
 			return;
 		}
 		mAcceptor.listen(boost::asio::socket_base::max_connections, error);
 		if (error) {
 			BOOST_NETWORK_MESSAGE("Error listening on socket: '"
-				<< error << "' on " << address_ << ":" << port_);
+				<< error << "' on " << address_ << ":" << server_port_number);
 			return;
 		}
 		new_connection.reset(new connection(mIoService, handler, *thread_pool, ctx_));
@@ -140,7 +140,7 @@ protected:
 		scoped_mutex_lock stopping_lock(stopping_mutex_);
 		stopping = false;  // if we were in the process of stopping, we revoke
 						   // that command and continue listening
-		NETWORK_MESSAGE("Now listening on socket: '" << address_ << ":" << port_ << "'");
+		NETWORK_MESSAGE("Now listening on socket: '" << address_ << ":" << server_port_number << "'");
 	}
 
 	
@@ -167,7 +167,7 @@ protected:
 
 			session->delegate_conection_reset_by_peer = std::move(std::bind(&AsyncTcpServerInterface::on_connection_reset_by_peer, this, std::placeholders::_1));
 
-			mConnectionManager.begin(session);
+			connection_manager.begin(session);
 			/*
 			if (mAcceptEventHandler != nullptr) {
 				mAcceptEventHandler(session);
@@ -195,7 +195,7 @@ protected:
 				//AsyncTcpSessionInterface_ptr session = AsyncTcpSessionInterface::create(std::move(mSocket));
 				session->delegate_conection_reset_by_peer = std::move(std::bind(&AsyncTcpServerInterface::on_connection_reset_by_peer, this, std::placeholders::_1));
 
-				mConnectionManager.begin(session);
+				connection_manager.begin(session);
 				if (delegate_accept != nullptr) {
 					delegate_accept(session);
 				}
@@ -228,14 +228,14 @@ protected:
 
 	void WriteAll(unsigned char* buffer, int len)
 	{
-		mConnectionManager.WriteAll(buffer, len);
+		connection_manager.WriteAll(buffer, len);
 
 		return;
 	}
 
 	bool Write(AsyncTcpSessionInterface_ptr session, unsigned char* buffer, int len)
 	{
-		return mConnectionManager.Write(session, buffer, len);
+		return connection_manager.Write(session, buffer, len);
 	}
 
 	bool Recv(AsyncTcpSessionInterface_ptr session, unsigned char* buffer, int len)
@@ -245,7 +245,6 @@ protected:
 	}
 
 	boost::asio::io_service&	mIoService;
-	AsyncConnectionManager		mConnectionManager;
 	tcp::acceptor	mAcceptor;
 	tcp::socket		mSocket;
 
@@ -253,8 +252,10 @@ protected:
 	std::mutex stopping_mutex_;
 	bool listening;
 	bool stopping;
-	unsigned short	port_;
+	unsigned short	server_port_number;
 	std::string address_;
+
+	AsyncConnectionManager		connection_manager;
 
 //	delegate  delegate_accept;
 };
