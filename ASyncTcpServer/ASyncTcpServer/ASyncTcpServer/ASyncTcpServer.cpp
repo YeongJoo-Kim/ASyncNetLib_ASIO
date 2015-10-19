@@ -1,14 +1,5 @@
 #include "ASyncTcpServer.h"
-/*
-int pos[100];
-for (i = 0; i<100; i++) pos[i] = i;
-for (i = 0; i<100; i++) {
-	int a = random(100);
-	int k = pos[i];
-	pos[i] = pos[a];
-	pos[a] = k;
-}
-*/
+
 ASyncTcpServer::ASyncTcpServer(boost::asio::io_service& io_service, unsigned short nPort)
 	: AsyncTcpServerInterface(io_service, nPort)
 {

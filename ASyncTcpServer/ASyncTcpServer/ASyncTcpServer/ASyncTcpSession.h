@@ -22,7 +22,12 @@ public:
 protected:
 	void worker_thread();
 	bool run;
-	std::condition_variable cv;
+	
 	std::thread	mWorker;
+
+	std::mutex				mWaitMutex;
+	std::mutex				mQueueMutex;
+	std::condition_variable_any mWaitObject;
+	std::deque<shared_const_buffer> mQueue;
 };
 

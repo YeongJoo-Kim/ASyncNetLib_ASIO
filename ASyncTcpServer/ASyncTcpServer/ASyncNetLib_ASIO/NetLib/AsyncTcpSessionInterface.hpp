@@ -181,10 +181,26 @@ protected:
 		return;
 	}
 #else
-	void do_write(uint8_t* buffer, std::size_t length, const bool bImmediately = false)
+	void do_write(uint8_t* buffer, std::size_t length)
 	{
 		shared_const_buffer _buffer(buffer, length);
+
 		bool writeInProgress = !write_queue.empty();
+		
+		write_queue.push_back(_buffer);
+
+		if (!writeInProgress)
+		{
+			do_write(_buffer);
+		}
+
+		return;
+	}
+
+	void do_write_buffer(shared_const_buffer &_buffer)
+	{
+		bool writeInProgress = !write_queue.empty();
+
 		write_queue.push_back(_buffer);
 
 		if (!writeInProgress)
@@ -202,6 +218,7 @@ protected:
 		{
 			if (ec == boost::asio::error::eof || ec == boost::asio::error::connection_reset)
 			{
+				std::cout << "!!!! boost::asio::error::connection_reset" << std::endl;
 				if (delegate_conection_reset_by_peer != nullptr) {
 					delegate_conection_reset_by_peer(shared_from_this());
 				}
@@ -261,7 +278,6 @@ private:
 	void do_write(shared_const_buffer &_buffer)
 	{
 		auto self(shared_from_this());
-
 		boost::asio::async_write(_socket, _buffer,
 			mStrand.wrap(boost::bind(
 				&AsyncTcpSessionInterface::__handler_write,
@@ -272,5 +288,6 @@ private:
 		return;
 
 	}
+	
 };
 

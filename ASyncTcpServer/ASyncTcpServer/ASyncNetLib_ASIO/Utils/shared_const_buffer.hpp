@@ -44,6 +44,9 @@ public:
 	typedef const boost::asio::const_buffer *const_iterator;
 	const boost::asio::const_buffer *begin() const { return &buffer_; }
 	const boost::asio::const_buffer *end() const { return &buffer_ + 1; }
+	std::size_t length() const { return data_length; }
+	uint8_t* data() const { return data_->data(); }
+	
 private:
 	boost::shared_ptr< std::vector<uint8_t> > data_;
 	boost::asio::const_buffer buffer_;
