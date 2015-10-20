@@ -29,7 +29,7 @@ void ASyncTcpSession::on_read_complete(unsigned char* buffer, size_t bytes_trans
 	mWaitObject.notify_one();
 	*/
 	
-	do_write(buffer, bytes_transferred);
+	write(buffer, bytes_transferred);
 }
 
 void ASyncTcpSession::on_write_complete(size_t bytes_transferred) {
@@ -49,7 +49,7 @@ void ASyncTcpSession::worker_thread() {
 		//shared_const_buffer _buffer(mQueue.front().buffer_., mQueue.front().length());
 		while (!mQueue.empty())
 		{
-			do_write(mQueue.front().data(), mQueue.front().length());
+			write(mQueue.front().data(), mQueue.front().length());
 			{
 				//std::cout << mQueue.size() << " " << mQueue.front().length() << endl;
 				std::lock_guard<std::mutex> lock(mQueueMutex);
