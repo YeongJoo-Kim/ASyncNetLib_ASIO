@@ -1,5 +1,6 @@
 ASyncNetLib-ASIO
 ================
+do not work
 
 visual studio 2015 community edition, boost boost_1_59_0, x64
 

@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
 	}
 
 	//boost::thread thread_1(boost::bind(&boost::asio::io_service::run, mIo));
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		boost::thread* t = new boost::thread(boost::bind(&boost::asio::io_service::run, mIo));
 
