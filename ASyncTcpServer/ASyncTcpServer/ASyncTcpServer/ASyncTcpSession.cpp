@@ -5,30 +5,34 @@ ASyncTcpSession::ASyncTcpSession(boost::asio::io_service& io)
 {
 	std::cout << "constructor of ASyncTcpSession" << endl;
 	run = true;
-	mWorker = std::thread(&ASyncTcpSession::worker_thread, this);
+	//mWorker = std::thread(&ASyncTcpSession::worker_thread, this);
 }
 
 ASyncTcpSession::~ASyncTcpSession()
 {
 	std::cout << "destructor of ASyncTcpSession" << endl;
 	run = false;
-	mWorker.join();
+	//mWaitObject.notify_one();
+	
+
+//	mWorker.join();
 }
 void ASyncTcpSession::on_read_complete(unsigned char* buffer, size_t bytes_transferred)
 {
 	//std::cout << "on_read_complete : " << buffer << "(" << bytes_transferred << ")" <<std::endl;
 	//std::cout << "on_read_complete : " << "(" << bytes_transferred << ")" << std::endl;
-
-
 	//do_write(buffer, bytes_transferred);
-
-	//shared_const_buffer _buffer
+	/*
 	{
 		std::lock_guard<std::mutex> lock(mQueueMutex);
 		mQueue.push_back(shared_const_buffer(buffer, bytes_transferred));
 	}
 
 	mWaitObject.notify_one();
+
+	*/
+	
+	do_write(buffer, bytes_transferred);
 }
 
 void ASyncTcpSession::on_write_complete(size_t bytes_transferred)
@@ -52,7 +56,7 @@ void ASyncTcpSession::worker_thread()
 		{
 			do_write(mQueue.front().data(), mQueue.front().length());
 			{
-				std::cout << mQueue.size() << " " << mQueue.front().length() << endl;
+				//std::cout << mQueue.size() << " " << mQueue.front().length() << endl;
 				std::lock_guard<std::mutex> lock(mQueueMutex);
 				mQueue.pop_front();
 				

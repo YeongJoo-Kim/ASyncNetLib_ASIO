@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
 
 	std::shared_ptr<boost::asio::io_service>	mIo = std::shared_ptr<boost::asio::io_service>(new boost::asio::io_service());
 	std::shared_ptr<void>						mIoWork = std::shared_ptr<boost::asio::io_service::work>(new boost::asio::io_service::work(*mIo));
-
+	std::vector<boost::thread*>					mThreads;
 
 	
 	
@@ -79,7 +79,21 @@ int main(int argc, char* argv[])
 		std::cerr << "Exception: " << e.what() << "\n";
 	}
 
-	boost::thread thread_1(boost::bind(&boost::asio::io_service::run, mIo));
+	//boost::thread thread_1(boost::bind(&boost::asio::io_service::run, mIo));
+	for (int i = 0; i < 5; i++)
+	{
+		boost::thread* t = new boost::thread(boost::bind(&boost::asio::io_service::run, mIo));
+
+		mThreads.push_back(t);
+	}
+/*
+	for (int i = 0; i < mThreads.size(); i++)
+	{
+		mThreads[i]->join();
+	}
+	*/
+	//for (boost::thread* t : mThreads) t->join();
+	
 	//boost::thread thread_2(boost::bind(&boost::asio::io_service::run, mIo));
 	//boost::thread thread_3(boost::bind(&boost::asio::io_service::run, mIo));
 	//boost::thread thread_4(boost::bind(&boost::asio::io_service::run, mIo));
@@ -105,7 +119,9 @@ int main(int argc, char* argv[])
 	}
 
 	mIo->stop();
-	thread_1.join();
+
+	for (boost::thread* t : mThreads) t->join();
+	//thread_1.join();
 	//thread_2.join();
 	//thread_3.join();
 	//thread_4.join();

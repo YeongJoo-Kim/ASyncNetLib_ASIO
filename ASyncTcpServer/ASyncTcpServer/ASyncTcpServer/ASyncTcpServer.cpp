@@ -37,7 +37,7 @@ AsyncTcpSessionInterface_ptr ASyncTcpServer::create_session()
 
 void ASyncTcpServer::onConnectionResetByPeer(AsyncTcpSessionInterface_ptr session)
 {
-	std::cout << "Connection Reset By Peer!! " << endl;
+	std::cout << "[ASyncTcpServer] Connection Reset By Peer!! " << endl;
 
 };
 #if 0

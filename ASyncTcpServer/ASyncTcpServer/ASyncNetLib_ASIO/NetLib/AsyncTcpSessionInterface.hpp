@@ -3,6 +3,8 @@
 #include <deque>
 #include <boost/asio.hpp>
 #include <boost/array.hpp>
+
+#include "../Utils/debug.hpp"
 #include "../Utils/shared_const_buffer.hpp"
 
 
@@ -63,14 +65,14 @@ protected:
 
 	void do_read()
 	{
-		auto self(shared_from_this());
+		//auto self(shared_from_this());
 		memset(data_, 0x00, max_length);
-
+		
 		_socket.async_read_some(
-			boost::asio::buffer(data_),
+			buffer_receive.prepare(max_length),
 			mStrand.wrap(boost::bind(
 				&AsyncTcpSessionInterface::__handler_recv,
-				self, 
+				shared_from_this(),
 				boost::asio::placeholders::error, 
 				boost::asio::placeholders::bytes_transferred)));
 	}
@@ -81,23 +83,25 @@ protected:
 	{
 		if (ec)
 		{
-			std::cout << ec.message() << std::endl;
+			
 			if (ec == boost::asio::error::eof)
 			{
-				std::cout << "boost::asio::error::eof" << std::endl;
+				NETWORK_MESSAGE("boost::asio::error::eof");
 				if (delegate_conection_reset_by_peer != nullptr) {
 					delegate_conection_reset_by_peer(shared_from_this());
 				}
 			}
 			else if (ec == boost::asio::error::connection_reset)
 			{
-				std::cout << "boost::asio::error::connection_reset" << std::endl;
-				//if (delegate_conection_reset_by_peer != nullptr) {
-				//	delegate_conection_reset_by_peer(shared_from_this());
-				//}
+				NETWORK_MESSAGE("boost::asio::error::connection_reset");
+				if (delegate_conection_reset_by_peer != nullptr) {
+					delegate_conection_reset_by_peer(shared_from_this());
+				}
 			}
 			else if (ec == boost::asio::error::operation_aborted)
 			{
+
+				NETWORK_MESSAGE("boost::asio::error::operation_aborted");
 				/*	if (mErrorEventHandler != nullptr) {
 				mErrorEventHandler(err.message(), bytesTransferred);
 				}
@@ -105,126 +109,80 @@ protected:
 			}
 			else
 			{
-
+				NETWORK_MESSAGE("Error Value : " << ec.value());
 			}
 
+			NETWORK_MESSAGE(" - " << ec.message());
+			std::cout << std::endl;
 			//error callback...
 		}
 		else
 		{
-			/*
-			if (mReadEventHandler != nullptr) {
+			buffer_receive.commit(bytes_transferred);
 
-			//std::cout << bytesTransferred << endl;
-			char* data = new char[bytesTransferred + 1]();
-			data[bytesTransferred] = 0;
-			mResponse.commit(bytesTransferred);
-			istream stream(&mResponse);
-			stream.read(data, bytesTransferred);
-			mReadEventHandler(Buffer::create(data, bytesTransferred), this);
+			uint8_t* data = new uint8_t[bytes_transferred + 1]();
+			data[bytes_transferred] = 0;
+
+			std::istream stream(&buffer_receive);
+			stream.read((char*)data, bytes_transferred);
+
+			on_read_complete(data, bytes_transferred);
+
 			delete[] data;
-			}
-			if (mReadCompleteEventHandler != nullptr &&
-			mBufferSize > 0 && bytesTransferred < mBufferSize) {
-			mReadCompleteEventHandler();
-			}
-			*/
-			
-			//
-			
-			on_read_complete(data_, bytes_transferred);
+
 			do_read();
 		}
 	}
-#if 0
-	void do_write(uint8_t* buffer, std::size_t length, const bool bImmediately = false)
-	{
-		auto self(shared_from_this());
-		
-		uint8_t* pSendData = nullptr;
-		if (bImmediately == false)
-		{
-			pSendData = new uint8_t[length];
-			memcpy(pSendData, buffer, length);
 
-			__buffer.push_back(pSendData);
-		}
-		else
-		{
-			pSendData = buffer;
-		}
-
-
-
-		if (bImmediately == false && __buffer.size() > 1)
-		{
-			return;
-		}
-		
-#if 0
-		boost::asio::async_write(mSocket, boost::asio::buffer(buffer, length), 
-			mStrand.wrap([this, self](boost::system::error_code ec, std::size_t /*length*/)
-				{
-					if (!ec)
-					{
-						return false;
-					}
-				}));
-#endif
-		boost::asio::async_write(_socket, boost::asio::buffer(pSendData, length),
-			mStrand.wrap(boost::bind(
-				&AsyncTcpSessionInterface::__handler_write, 
-				self,
-				boost::asio::placeholders::error,
-				boost::asio::placeholders::bytes_transferred)));
-
-		return;
-	}
-#else
 	void do_write(uint8_t* buffer, std::size_t length)
 	{
-		shared_const_buffer _buffer(buffer, length);
-
-		bool writeInProgress = !write_queue.empty();
 		
-		write_queue.push_back(_buffer);
+		std::unique_lock<std::mutex> lock(mutex_write);
+		
 
+		bool writeInProgress = buffer_write.size() > 0;
+
+		std::ostream stream(&buffer_write);
+		if (buffer && length > 0) {
+			stream.write((const char*)buffer, length);
+		}
+		
 		if (!writeInProgress)
 		{
-			do_write(_buffer);
-		}
+			boost::asio::async_write(_socket, buffer_write,
+				mStrand.wrap(boost::bind(
+					&AsyncTcpSessionInterface::__handler_write,
+					shared_from_this(),
+					boost::asio::placeholders::error,
+					boost::asio::placeholders::bytes_transferred)));
 
+			buffer_write.consume(buffer_write.size());
+		}
+		
 		return;
 	}
-
-	void do_write_buffer(shared_const_buffer &_buffer)
-	{
-		bool writeInProgress = !write_queue.empty();
-
-		write_queue.push_back(_buffer);
-
-		if (!writeInProgress)
-		{
-			do_write(_buffer);
-		}
-
-		return;
-	}
-
 
 	void __handler_write(const boost::system::error_code& ec, size_t bytes_transferred)
 	{
 		if (ec)
 		{
-			if (ec == boost::asio::error::eof || ec == boost::asio::error::connection_reset)
+			if (ec == boost::asio::error::eof )
 			{
-				std::cout << "!!!! boost::asio::error::connection_reset" << std::endl;
+				NETWORK_MESSAGE("boost::asio::error::eof");
+				if (delegate_conection_reset_by_peer != nullptr) {
+					delegate_conection_reset_by_peer(shared_from_this());
+				}
+			}
+			else if (ec == boost::asio::error::connection_reset)
+			{
+				NETWORK_MESSAGE("boost::asio::error::connection_reset");
 				if (delegate_conection_reset_by_peer != nullptr) {
 					delegate_conection_reset_by_peer(shared_from_this());
 				}
 			}
 			else if (ec == boost::asio::error::operation_aborted)
 			{
+				NETWORK_MESSAGE("boost::asio::error::operation_aborted");
 				/*
 				if (mErrorEventHandler != nullptr) {
 				mErrorEventHandler(err.message(), bytesTransferred);
@@ -233,28 +191,21 @@ protected:
 			}
 			else
 			{
-
+				NETWORK_MESSAGE("Error Value : " << ec.value());
 			}
-
-
+			NETWORK_MESSAGE(" - " << ec.message());
 		}
 		else
 		{
+			std::unique_lock<std::mutex> lock(mutex_write);
 
-			write_queue.pop_front();
-
-			on_write_complete(bytes_transferred);
-
-			if (!write_queue.empty())
+			if (buffer_write.size() > 0)
 			{
-				//std::cout << "queue count " << write_queue.size() << std::endl;
-				do_write(write_queue.front());
+				std::cout << "oops !!!!!!!!! " << std::endl;
+				do_write(nullptr, 0);
 			}
-
 		}
 	}
-#endif
-
 
 	//AsyncConnectionManager& mConnectionManager;
 	std::string		remote_address;
@@ -265,29 +216,44 @@ protected:
 	enum { max_length = 4096 };
 	uint8_t data_[max_length];
 	
-	//boost::asio::streambuf data_;
-	std::array<uint8_t, 8192> _buffer;
 	std::deque<shared_const_buffer> write_queue;
-	std::deque < std::shared_ptr<boost::asio::const_buffer>> ___buffer;
 
 	boost::asio::streambuf		buffer_write;
 	boost::asio::streambuf		buffer_receive;
 
-private:
+	std::mutex	mutex_write;
 
-	void do_write(shared_const_buffer &_buffer)
+protected :
+
+	void __error_handler(const std::string function, boost::system::error_code& ec)
 	{
-		auto self(shared_from_this());
-		boost::asio::async_write(_socket, _buffer,
-			mStrand.wrap(boost::bind(
-				&AsyncTcpSessionInterface::__handler_write,
-				self,
-				boost::asio::placeholders::error,
-				boost::asio::placeholders::bytes_transferred)));
-
-		return;
-
+		std::cerr << "[" << function << "] : ";
+		if (ec == boost::asio::error::eof)
+		{
+			std::cerr << "[__handler_write] boost::asio::error::eof" << std::endl;
+			if (delegate_conection_reset_by_peer != nullptr) {
+				delegate_conection_reset_by_peer(shared_from_this());
+			}
+		}
+		else if (ec == boost::asio::error::connection_reset)
+		{
+			std::cerr << "boost::asio::error::connection_reset" << std::endl;
+			if (delegate_conection_reset_by_peer != nullptr) {
+				delegate_conection_reset_by_peer(shared_from_this());
+			}
+		}
+		else if (ec == boost::asio::error::operation_aborted)
+		{
+			std::cerr << "boost::asio::error::operation_aborted" << std::endl;
+		}
+		else
+		{
+			std::cerr << "Error Value : " << ec.value() << std::endl;
+		}
+		std::cerr << " - " << ec.message() << std::endl;
 	}
+
+
 	
 };
 

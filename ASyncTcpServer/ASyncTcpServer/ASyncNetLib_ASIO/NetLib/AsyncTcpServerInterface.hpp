@@ -220,6 +220,7 @@ protected:
 	//connection reset by peer callback
 	void on_connection_reset_by_peer(AsyncTcpSessionInterface_ptr session)
 	{
+		connection_manager.stop(session);
 		if (delegate_connection_reset_by_peer)
 		{
 			delegate_connection_reset_by_peer(session);
