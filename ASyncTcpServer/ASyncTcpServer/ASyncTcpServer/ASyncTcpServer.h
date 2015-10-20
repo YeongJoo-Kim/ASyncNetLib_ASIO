@@ -17,7 +17,6 @@ public:
 	~ASyncTcpServer(void);
 
 	bool Begin();
-	void onAccept(AsyncTcpSessionInterface_ptr session);
 	void onConnectionResetByPeer(AsyncTcpSessionInterface_ptr session);
 	
 	void WriteAll()
@@ -25,6 +24,7 @@ public:
 	}
 
 	virtual AsyncTcpSessionInterface_ptr create_session();
+	virtual void on_accept(AsyncTcpSessionInterface_ptr session);
 
 protected:
 	short						mPort;

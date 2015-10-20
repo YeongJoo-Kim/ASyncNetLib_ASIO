@@ -24,13 +24,11 @@ class AsyncTcpServerInterface : public std::enable_shared_from_this<AsyncTcpServ
 public:
 	~AsyncTcpServerInterface()
 	{
-		delegate_accept = nullptr;
 		delegate_receive = nullptr;
 		delegate_connection_reset_by_peer = nullptr;
 	};
 
 	//delegate functions 
-	std::function<void (AsyncTcpSessionInterface_ptr session)>	delegate_accept;
 	std::function<void(AsyncTcpSessionInterface_ptr session, boost::system::error_code const &ec)>	delegate_accept_error;
 	std::function<void(AsyncTcpSessionInterface_ptr session)>	delegate_connection_reset_by_peer;
 	std::function<void(AsyncTcpSessionInterface_ptr session)>	delegate_receive;
@@ -82,6 +80,10 @@ protected:
 
 	virtual AsyncTcpSessionInterface_ptr create_session() {
 		return AsyncTcpSessionInterface::create(mIoService);
+	}
+
+	virtual void on_accept(AsyncTcpSessionInterface_ptr session) {
+
 	}
 
 	void start_listening() {
@@ -153,9 +155,7 @@ protected:
 
 			connection_manager.begin(session);
 
-			if (delegate_accept != nullptr) {
-				delegate_accept(session);
-			}
+			on_accept(session);
 
 		}
 		
@@ -175,9 +175,6 @@ protected:
 				session->delegate_conection_reset_by_peer = std::move(std::bind(&AsyncTcpServerInterface::on_connection_reset_by_peer, this, std::placeholders::_1));
 
 				connection_manager.begin(session);
-				if (delegate_accept != nullptr) {
-					delegate_accept(session);
-				}
 				do_accept();
 			}
 		});

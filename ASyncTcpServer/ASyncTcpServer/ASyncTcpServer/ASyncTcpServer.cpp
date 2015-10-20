@@ -14,7 +14,7 @@ ASyncTcpServer::~ASyncTcpServer()
 
 bool ASyncTcpServer::Begin()
 {
-	delegate_accept = std::move(std::bind(&ASyncTcpServer::onAccept, this, std::placeholders::_1));
+
 	delegate_connection_reset_by_peer = std::move(std::bind(&ASyncTcpServer::onConnectionResetByPeer, this, std::placeholders::_1));
 
 	run();
@@ -22,11 +22,11 @@ bool ASyncTcpServer::Begin()
 	return true;
 }
 
-void ASyncTcpServer::onAccept(AsyncTcpSessionInterface_ptr session)
+void ASyncTcpServer::on_accept(AsyncTcpSessionInterface_ptr session)
 {
 	ASyncTcpSession_ptr _session = std::dynamic_pointer_cast<ASyncTcpSession>(session);
 
-	std::cout << "OnAccept!! " << endl;
+	std::cout << "on_accept!! " << endl;
 };
 
 AsyncTcpSessionInterface_ptr ASyncTcpServer::create_session()
