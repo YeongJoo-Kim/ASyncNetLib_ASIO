@@ -9,7 +9,7 @@
 #include "../ASyncNetLib_ASIO/Utils/Log.hpp"
 
 using namespace std;
-typedef std::shared_ptr<class ASyncTcpSession> SyncSession_ptr;
+typedef std::shared_ptr<class ASyncTcpSession> ASyncTcpSession_ptr;
 class ASyncTcpSession : public AsyncTcpSessionInterface {
 public:
 	ASyncTcpSession(boost::asio::io_service& io);

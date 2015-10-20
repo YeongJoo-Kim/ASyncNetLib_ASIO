@@ -24,7 +24,7 @@ bool ASyncTcpServer::Begin()
 
 void ASyncTcpServer::onAccept(AsyncTcpSessionInterface_ptr session)
 {
-	SyncSession_ptr _session = std::dynamic_pointer_cast<ASyncTcpSession>(session);
+	ASyncTcpSession_ptr _session = std::dynamic_pointer_cast<ASyncTcpSession>(session);
 
 	std::cout << "OnAccept!! " << endl;
 };
