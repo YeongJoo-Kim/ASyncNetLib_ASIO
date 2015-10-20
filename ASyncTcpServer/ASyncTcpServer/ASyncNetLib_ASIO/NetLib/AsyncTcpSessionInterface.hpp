@@ -31,7 +31,7 @@ public:
 
 	
 	void start() {
-		do_read();
+		do_read(max_length);
 	}
 
 	void stop() {
@@ -48,7 +48,7 @@ public:
 
 protected:
 	AsyncTcpSessionInterface(boost::asio::io_service& io)
-		:mStrand(io), _socket(io),
+		:strand_recv(io), strand_write(io), _socket(io),
 		delegate_conection_reset_by_peer(nullptr)
 	{
 		boost::system::error_code ec;
@@ -60,12 +60,10 @@ protected:
 		}
 	};
 
-
-	void do_read()
-	{
+	void do_read(size_t buffer_length) {
 		_socket.async_read_some(
-			buffer_receive.prepare(max_length),
-			mStrand.wrap(boost::bind(
+			buffer_receive.prepare(buffer_length),
+			strand_recv.wrap(boost::bind(
 				&AsyncTcpSessionInterface::__handler_recv,
 				shared_from_this(),
 				boost::asio::placeholders::error, 
@@ -123,12 +121,35 @@ protected:
 
 			delete[] data;
 
-			do_read();
+			do_read(max_length);
 		}
 	}
 
-	void do_write(uint8_t* buffer, std::size_t length)
-	{
+	void write(uint8_t* buffer, std::size_t length) {
+		
+		std::unique_lock<std::mutex> lock(mutex_write);
+		bool writeInProgress = !write_queue.empty();
+
+		write_queue.push_back(shared_const_buffer(buffer, length));
+
+		if (!writeInProgress) {
+			do_write();
+		}
+
+
+	}
+
+	void do_write() {
+
+		boost::asio::async_write(_socket, write_queue.front(),
+			strand_write.wrap(boost::bind(
+				&AsyncTcpSessionInterface::__handler_write,
+				shared_from_this(),
+				boost::asio::placeholders::error,
+				boost::asio::placeholders::bytes_transferred)));
+	}
+	/*
+	void do_write(uint8_t* buffer, std::size_t length) {
 		
 		std::unique_lock<std::mutex> lock(mutex_write);
 		
@@ -143,7 +164,7 @@ protected:
 		if (!writeInProgress)
 		{
 			boost::asio::async_write(_socket, buffer_write,
-				mStrand.wrap(boost::bind(
+				strand_write.wrap(boost::bind(
 					&AsyncTcpSessionInterface::__handler_write,
 					shared_from_this(),
 					boost::asio::placeholders::error,
@@ -154,7 +175,7 @@ protected:
 		
 		return;
 	}
-
+	*/
 	void __handler_write(const boost::system::error_code& ec, size_t bytes_transferred)
 	{
 		if (ec)
@@ -190,12 +211,20 @@ protected:
 		}
 		else
 		{
+			/*
 			std::unique_lock<std::mutex> lock(mutex_write);
 
 			if (buffer_write.size() > 0)
 			{
-				std::cout << "oops !!!!!!!!! " << std::endl;
+				std::cout << "oops ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^!!!!!!!!! " << std::endl;
 				do_write(nullptr, 0);
+			}
+			*/
+
+			std::unique_lock<std::mutex> lock(mutex_write);
+			write_queue.pop_front();
+			if (!write_queue.empty()) {
+				do_write();
 			}
 		}
 	}
@@ -210,7 +239,8 @@ protected :
 	std::string					remote_address;
 	uint16_t					remote_port_number;
 	boost::asio::ip::tcp::socket _socket;
-	boost::asio::io_service::strand	mStrand;
+	boost::asio::io_service::strand	strand_recv;
+	boost::asio::io_service::strand	strand_write;
 	std::deque<shared_const_buffer> write_queue;
 
 	void __error_handler(const std::string function, boost::system::error_code& ec)
