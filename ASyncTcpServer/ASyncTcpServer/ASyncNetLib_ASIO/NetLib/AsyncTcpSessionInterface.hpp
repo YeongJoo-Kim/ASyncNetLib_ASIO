@@ -14,26 +14,22 @@ typedef std::shared_ptr<class AsyncTcpSessionInterface> AsyncTcpSessionInterface
 
 class AsyncTcpSessionInterface : public std::enable_shared_from_this<AsyncTcpSessionInterface>
 {
+	enum { max_length = 4096 };
 
 public:
 	static AsyncTcpSessionInterface_ptr	create(boost::asio::io_service& io) { return AsyncTcpSessionInterface_ptr(new AsyncTcpSessionInterface(io))->shared_from_this();}
-
-	~AsyncTcpSessionInterface()	{};
-
+	~AsyncTcpSessionInterface()	{
+	}
 	
 	std::function<void(AsyncTcpSessionInterface_ptr session)>	delegate_conection_reset_by_peer;
 
 	virtual void on_read_complete(unsigned char* buffer, size_t bytes_transferred) {
-
 	}
 
-	virtual void on_write_complete(size_t bytes_transferred) {
-	
+	virtual void on_write_complete(size_t bytes_transferred) {	
 	}
 
 	
-
-
 	void start() {
 		do_read();
 	}
@@ -41,13 +37,15 @@ public:
 	void stop() {
 		_socket.close();
 
-		while (write_queue.empty() == false)
-		{
+		while (write_queue.empty() == false) {
 			write_queue.pop_front();
 		}
 	}
 
-	boost::asio::ip::tcp::socket& Socket() { return _socket; };
+	boost::asio::ip::tcp::socket& Socket() { 
+		return _socket; 
+	};
+
 protected:
 	AsyncTcpSessionInterface(boost::asio::io_service& io)
 		:mStrand(io), _socket(io),
@@ -65,9 +63,6 @@ protected:
 
 	void do_read()
 	{
-		//auto self(shared_from_this());
-		memset(data_, 0x00, max_length);
-		
 		_socket.async_read_some(
 			buffer_receive.prepare(max_length),
 			mStrand.wrap(boost::bind(
@@ -76,8 +71,6 @@ protected:
 				boost::asio::placeholders::error, 
 				boost::asio::placeholders::bytes_transferred)));
 	}
-
-	
 
 	void __handler_recv(const boost::system::error_code& ec, size_t bytes_transferred)
 	{
@@ -207,23 +200,18 @@ protected:
 		}
 	}
 
-	//AsyncConnectionManager& mConnectionManager;
-	std::string		remote_address;
-	uint16_t		remote_port_number;
-	boost::asio::ip::tcp::socket _socket;
-	boost::asio::io_service::strand	mStrand;
 
-	enum { max_length = 4096 };
-	uint8_t data_[max_length];
-	
-	std::deque<shared_const_buffer> write_queue;
+protected :
 
 	boost::asio::streambuf		buffer_write;
 	boost::asio::streambuf		buffer_receive;
+	std::mutex					mutex_write;
 
-	std::mutex	mutex_write;
-
-protected :
+	std::string					remote_address;
+	uint16_t					remote_port_number;
+	boost::asio::ip::tcp::socket _socket;
+	boost::asio::io_service::strand	mStrand;
+	std::deque<shared_const_buffer> write_queue;
 
 	void __error_handler(const std::string function, boost::system::error_code& ec)
 	{

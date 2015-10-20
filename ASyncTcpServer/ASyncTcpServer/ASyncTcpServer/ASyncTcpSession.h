@@ -10,8 +10,7 @@
 
 using namespace std;
 typedef std::shared_ptr<class ASyncTcpSession> SyncSession_ptr;
-class ASyncTcpSession : public AsyncTcpSessionInterface
-{
+class ASyncTcpSession : public AsyncTcpSessionInterface {
 public:
 	ASyncTcpSession(boost::asio::io_service& io);
 	~ASyncTcpSession(void);

@@ -27,8 +27,6 @@ public:
 	virtual AsyncTcpSessionInterface_ptr create_session();
 
 protected:
-	//SyncServer(){};
-	//AsyncTcpServerInterface_ptr	mASyncTcpServer;
 	short						mPort;
 };
 

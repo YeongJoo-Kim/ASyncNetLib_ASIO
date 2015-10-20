@@ -29,25 +29,6 @@ BOOL WINAPI console_ctrl_handler(DWORD ctrl_type)
 
 int main(int argc, char* argv[])
 {
-	/*
-	std::shared_ptr<boost::asio::io_service>	mIo = std::shared_ptr<boost::asio::io_service>(new boost::asio::io_service());
-	std::shared_ptr<void>						mIoWork = std::shared_ptr<boost::asio::io_service::work>(new boost::asio::io_service::work(*mIo));
-
-	SyncServer sync(*mIo, 20000);
-
-	sync.start();
-
-
-	//cout << "press any key..." << endl;
-	//getchar();
-	mIo->run();
-
-	mIo->stop();
-
-
-	return 0;
-	*/
-
 
 	std::shared_ptr<boost::asio::io_service>	mIo = std::shared_ptr<boost::asio::io_service>(new boost::asio::io_service());
 	std::shared_ptr<void>						mIoWork = std::shared_ptr<boost::asio::io_service::work>(new boost::asio::io_service::work(*mIo));
@@ -86,21 +67,6 @@ int main(int argc, char* argv[])
 
 		mThreads.push_back(t);
 	}
-/*
-	for (int i = 0; i < mThreads.size(); i++)
-	{
-		mThreads[i]->join();
-	}
-	*/
-	//for (boost::thread* t : mThreads) t->join();
-	
-	//boost::thread thread_2(boost::bind(&boost::asio::io_service::run, mIo));
-	//boost::thread thread_3(boost::bind(&boost::asio::io_service::run, mIo));
-	//boost::thread thread_4(boost::bind(&boost::asio::io_service::run, mIo));
-
-	//mIo->run();
-
-	//SetConsoleCtrlHandler(console_ctrl_handler, TRUE);
 
 	char ch = 0;
 	while (getchar() != 'q')
@@ -121,10 +87,7 @@ int main(int argc, char* argv[])
 	mIo->stop();
 
 	for (boost::thread* t : mThreads) t->join();
-	//thread_1.join();
-	//thread_2.join();
-	//thread_3.join();
-	//thread_4.join();
+
 	return 0;
 }
 

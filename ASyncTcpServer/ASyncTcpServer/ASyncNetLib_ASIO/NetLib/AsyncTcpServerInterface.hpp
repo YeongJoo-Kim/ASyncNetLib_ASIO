@@ -20,16 +20,8 @@ using boost::asio::ip::tcp;
 
 typedef std::shared_ptr<class AsyncTcpServerInterface>			AsyncTcpServerInterface_ptr;
 typedef std::unique_lock<std::mutex> scoped_mutex_lock;
-class AsyncTcpServerInterface : public std::enable_shared_from_this<AsyncTcpServerInterface>
-{
+class AsyncTcpServerInterface : public std::enable_shared_from_this<AsyncTcpServerInterface> {
 public:
-	/*
-	static AsyncTcpServerInterface_ptr	create(boost::asio::io_service& io, unsigned short nPort)
-	{
-		return AsyncTcpServerInterface_ptr(new AsyncTcpServerInterface(io, nPort))->shared_from_this();
-	};
-	*/
-
 	~AsyncTcpServerInterface()
 	{
 		delegate_accept = nullptr;
@@ -39,20 +31,18 @@ public:
 
 	//delegate functions 
 	std::function<void (AsyncTcpSessionInterface_ptr session)>	delegate_accept;
+	std::function<void(AsyncTcpSessionInterface_ptr session, boost::system::error_code const &ec)>	delegate_accept_error;
 	std::function<void(AsyncTcpSessionInterface_ptr session)>	delegate_connection_reset_by_peer;
 	std::function<void(AsyncTcpSessionInterface_ptr session)>	delegate_receive;
+	
 
-	void run()
-	{
+	void run() {
 		listen();
-		//service_.run();
 	}
 
-	void stop()
-	{
+	void stop() {
 		scoped_mutex_lock listening_lock(listening_mutex_);
-		if (listening) 
-		{  
+		if (listening) {  
 			scoped_mutex_lock stopping_lock(stopping_mutex_);
 			stopping = true;
 			boost::system::error_code ignored;
@@ -72,17 +62,17 @@ protected:
 		listening(false),
 		stopping(false),
 		server_port_number(nPort),
-		address_("localhost")
+		address_("localhost"),
+		delegate_accept_error(nullptr)
 	{};
 
 	void listen() {
 		scoped_mutex_lock listening_lock(listening_mutex_);
 		NETWORK_MESSAGE("Listening on " << address_ << ':' << server_port_number);
-		if (!listening)
-			start_listening();  // we only initialize our acceptor/sockets if we
-								// arent already listening
+		if (!listening) {
+			start_listening();
+		}
 
-			//do_accept();
 		if (!listening) {
 			NETWORK_MESSAGE("Error listening on " << address_ << ':' << server_port_number);
 			boost::throw_exception(
@@ -90,8 +80,7 @@ protected:
 		}
 	}
 
-	virtual AsyncTcpSessionInterface_ptr create_session()
-	{
+	virtual AsyncTcpSessionInterface_ptr create_session() {
 		return AsyncTcpSessionInterface::create(mIoService);
 	}
 
@@ -105,31 +94,32 @@ protected:
 		tcp::resolver::query query(address_, server_port_number);
 		tcp::resolver::iterator endpoint_iterator = resolver.resolve(query, error);
 		if (error) {
-			BOOST_NETWORK_MESSAGE("Error resolving '" << address_ << ':' << server_port_number);
+			NETWORK_MESSAGE("Error resolving '" << address_ << ':' << server_port_number);
 			return;
 		}
 		tcp::endpoint endpoint = *endpoint_iterator;
 		mAcceptor.open(endpoint.protocol(), error);
 		if (error) {
-			BOOST_NETWORK_MESSAGE("Error opening socket: " << address_ << ":"
+			NETWORK_MESSAGE("Error opening socket: " << address_ << ":"
 				<< server_port_number);
 			return;
 		}
 		socket_options_base::acceptor_options(mAcceptor);
 		mAcceptor.bind(endpoint, error);
 		if (error) {
-			BOOST_NETWORK_MESSAGE("Error binding socket: " << address_ << ":"
+			NETWORK_MESSAGE("Error binding socket: " << address_ << ":"
 				<< server_port_number);
 			return;
 		}
 		mAcceptor.listen(boost::asio::socket_base::max_connections, error);
 		if (error) {
-			BOOST_NETWORK_MESSAGE("Error listening on socket: '"
+			NETWORK_MESSAGE("Error listening on socket: '"
 				<< error << "' on " << address_ << ":" << server_port_number);
 			return;
 		}
 		new_connection.reset(new connection(mIoService, handler, *thread_pool, ctx_));
 		*/
+
 		AsyncTcpSessionInterface_ptr session = create_session();
 
 		mAcceptor.async_accept(
@@ -145,40 +135,29 @@ protected:
 
 	
 
-	void  do_accept(AsyncTcpSessionInterface_ptr session, boost::system::error_code const &ec)
-	{
+	void  do_accept(AsyncTcpSessionInterface_ptr session, boost::system::error_code const &ec) {
 		scoped_mutex_lock stopping_lock(stopping_mutex_);
-		if (stopping)
-			return; 
+		if (stopping) {
+			return;
+		}
 	
 		if (ec) {
+
 			NETWORK_MESSAGE("Error accepting connection, reason: " << ec);
-		}
-
-		if (ec) {
-			/*if (mErrorEventHandler != nullptr) {
-				mErrorEventHandler(err.message(), 0);
+			if (delegate_accept_error != nullptr) {
+				delegate_accept_error(session, ec);
 			}
-			*/
-
 		}
 		else {
-
-
 			session->delegate_conection_reset_by_peer = std::move(std::bind(&AsyncTcpServerInterface::on_connection_reset_by_peer, this, std::placeholders::_1));
 
 			connection_manager.begin(session);
-			/*
-			if (mAcceptEventHandler != nullptr) {
-				mAcceptEventHandler(session);
-			}
-			*/
 
 			if (delegate_accept != nullptr) {
 				delegate_accept(session);
 			}
-		}
 
+		}
 		
 		AsyncTcpSessionInterface_ptr new_session = create_session();
 
@@ -199,13 +178,10 @@ protected:
 				if (delegate_accept != nullptr) {
 					delegate_accept(session);
 				}
-
-				//must call do_accept
+				do_accept();
 			}
-
 		});
 		*/
-		
 
 		return;
 	};
@@ -218,29 +194,24 @@ protected:
 	}
 
 	//connection reset by peer callback
-	void on_connection_reset_by_peer(AsyncTcpSessionInterface_ptr session)
-	{
+	void on_connection_reset_by_peer(AsyncTcpSessionInterface_ptr session) {
 		connection_manager.stop(session);
-		if (delegate_connection_reset_by_peer)
-		{
+		if (delegate_connection_reset_by_peer) {
 			delegate_connection_reset_by_peer(session);
 		}
 	}
 
-	void WriteAll(unsigned char* buffer, int len)
-	{
+	void WriteAll(unsigned char* buffer, int len) {
 		connection_manager.WriteAll(buffer, len);
 
 		return;
 	}
 
-	bool Write(AsyncTcpSessionInterface_ptr session, unsigned char* buffer, int len)
-	{
+	bool Write(AsyncTcpSessionInterface_ptr session, unsigned char* buffer, int len) {
 		return connection_manager.Write(session, buffer, len);
 	}
 
-	bool Recv(AsyncTcpSessionInterface_ptr session, unsigned char* buffer, int len)
-	{
+	bool Recv(AsyncTcpSessionInterface_ptr session, unsigned char* buffer, int len) {
 
 		return true;
 	}
@@ -257,6 +228,4 @@ protected:
 	std::string address_;
 
 	AsyncConnectionManager		connection_manager;
-
-//	delegate  delegate_accept;
 };
