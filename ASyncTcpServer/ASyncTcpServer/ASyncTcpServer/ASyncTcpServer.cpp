@@ -29,6 +29,13 @@ void ASyncTcpServer::on_accept(AsyncTcpSessionInterface_ptr session)
 	std::cout << "on_accept!! " << endl;
 };
 
+void ASyncTcpServer::on_accept_error(AsyncTcpSessionInterface_ptr session, boost::system::error_code const &ec)
+{
+	ASyncTcpSession_ptr _session = std::dynamic_pointer_cast<ASyncTcpSession>(session);
+
+	std::cout << "on_accept_error!! " << endl;
+}
+
 AsyncTcpSessionInterface_ptr ASyncTcpServer::create_session()
 {
 	return std::make_shared<ASyncTcpSession>(mIoService);

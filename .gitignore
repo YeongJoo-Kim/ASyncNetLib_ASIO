@@ -9,3 +9,5 @@
 *.ilk
 *.pdb
 *.pch
+*.ipdb
+*.iobj

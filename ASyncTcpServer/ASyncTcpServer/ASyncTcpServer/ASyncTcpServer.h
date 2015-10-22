@@ -25,6 +25,7 @@ public:
 
 	virtual AsyncTcpSessionInterface_ptr create_session();
 	virtual void on_accept(AsyncTcpSessionInterface_ptr session);
+	virtual void on_accept_error(AsyncTcpSessionInterface_ptr session, boost::system::error_code const &ec);
 
 protected:
 	short						mPort;

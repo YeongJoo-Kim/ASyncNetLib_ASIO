@@ -24,15 +24,11 @@ class AsyncTcpServerInterface : public std::enable_shared_from_this<AsyncTcpServ
 public:
 	~AsyncTcpServerInterface()
 	{
-		delegate_receive = nullptr;
 		delegate_connection_reset_by_peer = nullptr;
 	};
 
-	//delegate functions 
-	std::function<void(AsyncTcpSessionInterface_ptr session, boost::system::error_code const &ec)>	delegate_accept_error;
 	std::function<void(AsyncTcpSessionInterface_ptr session)>	delegate_connection_reset_by_peer;
-	std::function<void(AsyncTcpSessionInterface_ptr session)>	delegate_receive;
-	
+
 
 	void run() {
 		listen();
@@ -40,7 +36,7 @@ public:
 
 	void stop() {
 		scoped_mutex_lock listening_lock(listening_mutex_);
-		if (listening) {  
+		if (listening) {
 			scoped_mutex_lock stopping_lock(stopping_mutex_);
 			stopping = true;
 			boost::system::error_code ignored;
@@ -49,7 +45,7 @@ public:
 			mIoService.post(boost::bind(&AsyncTcpServerInterface::handle_stop, this));
 		}
 	}
-	
+
 
 protected:
 	AsyncTcpServerInterface(boost::asio::io_service& ioService, unsigned short nPort) :
@@ -60,8 +56,7 @@ protected:
 		listening(false),
 		stopping(false),
 		server_port_number(nPort),
-		address_("localhost"),
-		delegate_accept_error(nullptr)
+		address_("localhost")
 	{};
 
 	void listen() {
@@ -83,6 +78,10 @@ protected:
 	}
 
 	virtual void on_accept(AsyncTcpSessionInterface_ptr session) {
+
+	}
+
+	virtual void on_accept_error(AsyncTcpSessionInterface_ptr session, boost::system::error_code const &ec) {
 
 	}
 
@@ -135,20 +134,19 @@ protected:
 		NETWORK_MESSAGE("Now listening on socket: '" << address_ << ":" << server_port_number << "'");
 	}
 
-	
+
 
 	void  do_accept(AsyncTcpSessionInterface_ptr session, boost::system::error_code const &ec) {
 		scoped_mutex_lock stopping_lock(stopping_mutex_);
 		if (stopping) {
 			return;
 		}
-	
+
 		if (ec) {
 
 			NETWORK_MESSAGE("Error accepting connection, reason: " << ec);
-			if (delegate_accept_error != nullptr) {
-				delegate_accept_error(session, ec);
-			}
+			on_accept_error(session, ec);
+
 		}
 		else {
 			session->delegate_conection_reset_by_peer = std::move(std::bind(&AsyncTcpServerInterface::on_connection_reset_by_peer, this, std::placeholders::_1));
@@ -158,7 +156,7 @@ protected:
 			on_accept(session);
 
 		}
-		
+
 		AsyncTcpSessionInterface_ptr new_session = create_session();
 
 		mAcceptor.async_accept(
