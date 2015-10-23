@@ -22,11 +22,13 @@ public:
 	}
 	
 	std::function<void(AsyncTcpSessionInterface_ptr session)>	delegate_conection_reset_by_peer;
+
 	/*
 	virtual void on_read_complete(unsigned char* buffer, size_t bytes_transferred) {
 	}
 	*/
 	virtual void on_read_complete(size_t bytes_transferred) {
+
 	}
 
 	virtual void on_write_complete(size_t bytes_transferred) {	
@@ -121,7 +123,7 @@ protected:
 		else
 		{
 			buffer_receive.commit(bytes_transferred);
-			/*
+/*
 			uint8_t* data = new uint8_t[bytes_transferred + 1]();
 			data[bytes_transferred] = 0;
 
@@ -131,10 +133,8 @@ protected:
 			on_read_complete(data, bytes_transferred);
 
 			delete[] data;
-			*/
-
+*/
 			on_read_complete(bytes_transferred);
-
 			do_read(max_length);
 		}
 	}
