@@ -149,10 +149,9 @@ protected:
 
 		}
 		else {
+			
 			session->delegate_conection_reset_by_peer = std::move(std::bind(&AsyncTcpServerInterface::on_connection_reset_by_peer, this, std::placeholders::_1));
-
 			connection_manager.begin(session);
-
 			on_accept(session);
 
 		}

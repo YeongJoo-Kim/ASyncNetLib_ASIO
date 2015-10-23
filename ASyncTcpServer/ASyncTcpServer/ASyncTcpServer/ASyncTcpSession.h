@@ -14,7 +14,7 @@ class ASyncTcpSession : public AsyncTcpSessionInterface {
 public:
 	ASyncTcpSession(boost::asio::io_service& io);
 	~ASyncTcpSession(void);
-	virtual void on_read_complete(unsigned char* buffer, size_t bytes_transferred);
+	virtual void on_read_complete(size_t bytes_transferred);
 	virtual void on_write_complete(size_t bytes_transferred);
 
 	

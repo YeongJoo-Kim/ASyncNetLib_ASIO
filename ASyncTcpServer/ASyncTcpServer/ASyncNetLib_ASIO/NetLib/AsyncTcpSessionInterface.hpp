@@ -22,8 +22,11 @@ public:
 	}
 	
 	std::function<void(AsyncTcpSessionInterface_ptr session)>	delegate_conection_reset_by_peer;
-
+	/*
 	virtual void on_read_complete(unsigned char* buffer, size_t bytes_transferred) {
+	}
+	*/
+	virtual void on_read_complete(size_t bytes_transferred) {
 	}
 
 	virtual void on_write_complete(size_t bytes_transferred) {	
@@ -31,6 +34,9 @@ public:
 
 	
 	void start() {
+
+		remote_address = _socket.remote_endpoint().address().to_string();
+
 		do_read(max_length);
 	}
 
@@ -45,6 +51,11 @@ public:
 	boost::asio::ip::tcp::socket& Socket() { 
 		return _socket; 
 	};
+
+	std::string get_remote_address()
+	{
+		return remote_address;
+	}
 
 protected:
 	AsyncTcpSessionInterface(boost::asio::io_service& io)
@@ -110,7 +121,7 @@ protected:
 		else
 		{
 			buffer_receive.commit(bytes_transferred);
-
+			/*
 			uint8_t* data = new uint8_t[bytes_transferred + 1]();
 			data[bytes_transferred] = 0;
 
@@ -120,6 +131,9 @@ protected:
 			on_read_complete(data, bytes_transferred);
 
 			delete[] data;
+			*/
+
+			on_read_complete(bytes_transferred);
 
 			do_read(max_length);
 		}

@@ -11,8 +11,16 @@ ASyncTcpSession::~ASyncTcpSession() {
 	std::cout << "destructor of ASyncTcpSession" << endl;
 
 }
-void ASyncTcpSession::on_read_complete(unsigned char* buffer, size_t bytes_transferred) {
-	write(buffer, bytes_transferred);
+void ASyncTcpSession::on_read_complete(size_t bytes_transferred) {
+
+	uint8_t* data_ = new uint8_t[bytes_transferred + 1]();
+
+	data_[bytes_transferred] = 0;
+
+	std::istream stream(&buffer_receive);
+	stream.read((char*)data_, bytes_transferred);
+
+	write(data_, bytes_transferred);
 }
 
 void ASyncTcpSession::on_write_complete(size_t bytes_transferred) {
