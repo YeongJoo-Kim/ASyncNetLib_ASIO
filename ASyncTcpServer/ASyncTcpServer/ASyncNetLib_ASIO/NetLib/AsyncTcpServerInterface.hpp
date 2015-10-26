@@ -20,6 +20,7 @@ using boost::asio::ip::tcp;
 
 typedef std::shared_ptr<class AsyncTcpServerInterface>			AsyncTcpServerInterface_ptr;
 typedef std::unique_lock<std::mutex> scoped_mutex_lock;
+
 class AsyncTcpServerInterface : public std::enable_shared_from_this<AsyncTcpServerInterface> {
 public:
 	~AsyncTcpServerInterface()
@@ -189,23 +190,25 @@ protected:
 
 	//connection reset by peer callback
 	void on_connection_reset_by_peer(AsyncTcpSessionInterface_ptr session) {
-		connection_manager.stop(session);
 		if (delegate_connection_reset_by_peer) {
 			delegate_connection_reset_by_peer(session);
 		}
+
+		connection_manager.stop(session);
 	}
 
-	void WriteAll(unsigned char* buffer, int len) {
-		connection_manager.WriteAll(buffer, len);
+	void write_all(unsigned char* buffer, int len) {
+
+		connection_manager.write_all(buffer, len);
 
 		return;
 	}
 
-	bool Write(AsyncTcpSessionInterface_ptr session, unsigned char* buffer, int len) {
-		return connection_manager.Write(session, buffer, len);
+	bool write(AsyncTcpSessionInterface_ptr session, unsigned char* buffer, int len) {
+		return connection_manager.write(session, buffer, len);
 	}
 
-	bool Recv(AsyncTcpSessionInterface_ptr session, unsigned char* buffer, int len) {
+	bool recv(AsyncTcpSessionInterface_ptr session, unsigned char* buffer, int len) {
 
 		return true;
 	}

@@ -139,7 +139,7 @@ protected:
 		}
 	}
 
-	void write(uint8_t* buffer, std::size_t length) {
+	void do_write(uint8_t* buffer, std::size_t length) {
 		
 		std::unique_lock<std::mutex> lock(mutex_write);
 		bool writeInProgress = !write_queue.empty();
