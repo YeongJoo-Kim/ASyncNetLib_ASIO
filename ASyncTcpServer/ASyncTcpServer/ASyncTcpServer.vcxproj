@@ -155,7 +155,6 @@
     <ClInclude Include="ASyncNetLib_ASIO\NetLib\AsyncTcpServerInterface.hpp" />
     <ClInclude Include="ASyncNetLib_ASIO\NetLib\AsyncTcpSessionInterface.hpp" />
     <ClInclude Include="ASyncNetLib_ASIO\Utils\debug.hpp" />
-    <ClInclude Include="ASyncNetLib_ASIO\Utils\Log.hpp" />
     <ClInclude Include="ASyncNetLib_ASIO\Utils\shared_const_buffer.hpp" />
     <ClInclude Include="ASyncTcpServer\ASyncTcpServer.h" />
     <ClInclude Include="ASyncTcpServer\ASyncTcpSession.h" />

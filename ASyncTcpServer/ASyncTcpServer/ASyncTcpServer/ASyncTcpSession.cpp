@@ -20,7 +20,7 @@ void ASyncTcpSession::on_read_complete(size_t bytes_transferred) {
 	std::istream stream(&buffer_receive);
 	stream.read((char*)data_, bytes_transferred);
 
-	write(data_, bytes_transferred);
+	do_write(data_, bytes_transferred);
 }
 
 void ASyncTcpSession::on_write_complete(size_t bytes_transferred) {

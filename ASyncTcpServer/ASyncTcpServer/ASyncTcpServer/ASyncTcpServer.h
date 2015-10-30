@@ -4,7 +4,7 @@
 #include <memory>
 #include <boost/thread.hpp>
 #include "../ASyncNetLib_ASIO/NetLib/AsyncTcpServerInterface.hpp"
-#include "../ASyncNetLib_ASIO/Utils/Log.hpp"
+
 
 #include "ASyncTcpSession.h"
 

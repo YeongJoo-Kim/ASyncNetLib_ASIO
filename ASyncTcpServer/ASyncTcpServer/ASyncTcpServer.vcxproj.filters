@@ -48,9 +48,6 @@
     <ClInclude Include="ASyncNetLib_ASIO\Utils\debug.hpp">
       <Filter>ASyncNetLib_ASIO\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="ASyncNetLib_ASIO\Utils\Log.hpp">
-      <Filter>ASyncNetLib_ASIO\Utils</Filter>
-    </ClInclude>
     <ClInclude Include="ASyncTcpServer\ASyncTcpServer.h">
       <Filter>ASyncTcpServer</Filter>
     </ClInclude>

@@ -6,7 +6,6 @@
 #include <condition_variable>
 #include <boost/thread.hpp>
 #include "../ASyncNetLib_ASIO/NetLib/AsyncTcpSessionInterface.hpp"
-#include "../ASyncNetLib_ASIO/Utils/Log.hpp"
 
 using namespace std;
 typedef std::shared_ptr<class ASyncTcpSession> ASyncTcpSession_ptr;
