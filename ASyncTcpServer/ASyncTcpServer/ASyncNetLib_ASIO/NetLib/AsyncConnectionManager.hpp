@@ -25,7 +25,7 @@ public:
 		connections.clear();
 	}
 	
-	void write_all(unsigned char* buffer, unsigned int len) {
+	void write_all(uint8_t* buffer, size_t len) {
 		/*
 		std::for_each(mConnections.begin(), mConnections.end(), [this](AsyncTcpSessionInterface_ptr connection)
 		{
@@ -34,9 +34,15 @@ public:
 		);
 		*/
 
+		std::for_each(connections.begin(), connections.end(), [=](AsyncTcpSessionInterface_ptr connection)
+		{
+			connection->do_write(buffer, len);
+		}
+		);
+
 	}
 
-	bool write(AsyncTcpSessionInterface_ptr session, unsigned char* buffer, int len) {
+	bool write(AsyncTcpSessionInterface_ptr session, uint8_t* buffer, int len) {
 
 /*		AsyncTcpSessionInterface_ptr _session = connections[session];
 

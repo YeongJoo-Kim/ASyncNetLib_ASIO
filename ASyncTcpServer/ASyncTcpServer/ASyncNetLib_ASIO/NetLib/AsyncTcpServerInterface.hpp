@@ -197,18 +197,18 @@ protected:
 		connection_manager.stop(session);
 	}
 
-	void write_all(unsigned char* buffer, int len) {
+	void write_all(uint8_t* buffer, size_t len) {
 
 		connection_manager.write_all(buffer, len);
 
 		return;
 	}
 
-	bool write(AsyncTcpSessionInterface_ptr session, unsigned char* buffer, int len) {
+	bool write(AsyncTcpSessionInterface_ptr session, uint8_t* buffer, int len) {
 		return connection_manager.write(session, buffer, len);
 	}
 
-	bool recv(AsyncTcpSessionInterface_ptr session, unsigned char* buffer, int len) {
+	bool recv(AsyncTcpSessionInterface_ptr session, uint8_t* buffer, int len) {
 
 		return true;
 	}

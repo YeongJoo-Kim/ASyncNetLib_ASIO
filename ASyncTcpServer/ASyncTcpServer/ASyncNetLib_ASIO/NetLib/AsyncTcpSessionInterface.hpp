@@ -59,6 +59,20 @@ public:
 		return remote_address;
 	}
 
+	void do_write(uint8_t* buffer, std::size_t length) {
+
+		std::unique_lock<std::mutex> lock(mutex_write);
+		bool writeInProgress = !write_queue.empty();
+
+		write_queue.push_back(shared_const_buffer(buffer, length));
+
+		if (!writeInProgress) {
+			do_write();
+		}
+
+
+	}
+
 protected:
 	AsyncTcpSessionInterface(boost::asio::io_service& io)
 		:strand_recv(io), strand_write(io), _socket(io),
@@ -139,19 +153,7 @@ protected:
 		}
 	}
 
-	void do_write(uint8_t* buffer, std::size_t length) {
 		
-		std::unique_lock<std::mutex> lock(mutex_write);
-		bool writeInProgress = !write_queue.empty();
-
-		write_queue.push_back(shared_const_buffer(buffer, length));
-
-		if (!writeInProgress) {
-			do_write();
-		}
-
-
-	}
 
 	void do_write() {
 
