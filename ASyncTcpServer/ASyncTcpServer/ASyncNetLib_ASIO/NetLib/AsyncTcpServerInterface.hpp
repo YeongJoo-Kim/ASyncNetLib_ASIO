@@ -19,10 +19,10 @@
 using boost::asio::ip::tcp;
 
 typedef std::shared_ptr<class AsyncTcpServerInterface>			AsyncTcpServerInterface_ptr;
-typedef std::unique_lock<std::mutex> scoped_mutex_lock;
 
 class AsyncTcpServerInterface : public std::enable_shared_from_this<AsyncTcpServerInterface> {
 public:
+	typedef std::unique_lock<std::mutex> scoped_mutex_lock;
 	~AsyncTcpServerInterface()
 	{
 		delegate_connection_reset_by_peer = nullptr;
