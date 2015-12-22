@@ -152,7 +152,7 @@ protected:
 		else {
 			
 			session->delegate_conection_reset_by_peer = std::move(std::bind(&AsyncTcpServerInterface::on_connection_reset_by_peer, this, std::placeholders::_1));
-			connection_manager.begin(session);
+			mConnectionManager.begin(session);
 			on_accept(session);
 
 		}
@@ -172,7 +172,7 @@ protected:
 				//AsyncTcpSessionInterface_ptr session = AsyncTcpSessionInterface::create(std::move(mSocket));
 				session->delegate_conection_reset_by_peer = std::move(std::bind(&AsyncTcpServerInterface::on_connection_reset_by_peer, this, std::placeholders::_1));
 
-				connection_manager.begin(session);
+		mConnectionManager.begin(session);
 				do_accept();
 			}
 		});
@@ -186,6 +186,8 @@ protected:
 		if (stopping)
 			mIoService.stop();  // a user may have started listening again before
 							  // the stop command is reached
+
+		mConnectionManager.stop_all();
 	}
 
 	//connection reset by peer callback
@@ -194,18 +196,18 @@ protected:
 			delegate_connection_reset_by_peer(session);
 		}
 
-		connection_manager.stop(session);
+		mConnectionManager.stop(session);
 	}
 
 	void write_all(uint8_t* buffer, size_t len) {
 
-		connection_manager.write_all(buffer, len);
+		mConnectionManager.write_all(buffer, len);
 
 		return;
 	}
 
 	bool write(AsyncTcpSessionInterface_ptr session, uint8_t* buffer, int len) {
-		return connection_manager.write(session, buffer, len);
+		return mConnectionManager.write(session, buffer, len);
 	}
 
 	bool recv(AsyncTcpSessionInterface_ptr session, uint8_t* buffer, int len) {
@@ -224,5 +226,5 @@ protected:
 	unsigned short	server_port_number;
 	std::string address_;
 
-	AsyncConnectionManager		connection_manager;
+	AsyncConnectionManager		mConnectionManager;
 };
