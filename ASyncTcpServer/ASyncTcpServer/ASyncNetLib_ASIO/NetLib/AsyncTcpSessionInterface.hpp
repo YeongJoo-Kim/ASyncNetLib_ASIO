@@ -45,6 +45,7 @@ public:
 	void stop() {
 		_socket.close();
 
+		std::unique_lock<std::mutex> lock(mutex_write);
 		while (write_queue.empty() == false) {
 			write_queue.pop_front();
 		}
@@ -124,6 +125,8 @@ protected:
 				mErrorEventHandler(err.message(), bytesTransferred);
 				}
 				*/
+
+				std::cout << "boost::asio::error::operation_aborted" << std::endl;
 			}
 			else
 			{
@@ -238,9 +241,12 @@ protected:
 			*/
 
 			std::unique_lock<std::mutex> lock(mutex_write);
-			write_queue.pop_front();
 			if (!write_queue.empty()) {
-				do_write();
+				write_queue.pop_front();
+
+				if (!write_queue.empty()) {
+					do_write();
+				}
 			}
 		}
 	}
