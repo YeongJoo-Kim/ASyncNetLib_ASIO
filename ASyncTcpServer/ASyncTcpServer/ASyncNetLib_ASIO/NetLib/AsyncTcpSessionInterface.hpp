@@ -75,9 +75,8 @@ public:
 	}
 
 protected:
-	AsyncTcpSessionInterface(boost::asio::io_service& io)
-		:strand_recv(io), strand_write(io), _socket(io),
-		delegate_conection_reset_by_peer(nullptr)
+	//AsyncTcpSessionInterface(boost::asio::io_service& io):strand_recv(io), strand_write(io), _socket(io), delegate_conection_reset_by_peer(nullptr)
+	AsyncTcpSessionInterface(boost::asio::io_service& io): mStrand(io), _socket(io),delegate_conection_reset_by_peer(nullptr)
 	{
 		boost::system::error_code ec;
 		tcp::endpoint endpoint = _socket.remote_endpoint(ec);
@@ -87,11 +86,11 @@ protected:
 			remote_port_number = endpoint.port();
 		}
 	};
-
+	
 	void do_read(size_t buffer_length) {
 		_socket.async_read_some(
 			buffer_receive.prepare(buffer_length),
-			strand_recv.wrap(boost::bind(
+			mStrand.wrap(boost::bind(
 				&AsyncTcpSessionInterface::__handler_recv,
 				shared_from_this(),
 				boost::asio::placeholders::error, 
@@ -100,9 +99,17 @@ protected:
 
 	void __handler_recv(const boost::system::error_code& ec, size_t bytes_transferred)
 	{
+		
 		if (ec)
 		{
-			
+			NETWORK_MESSAGE("Error Value : " << ec.value());
+			NETWORK_MESSAGE("Error Message : " << ec.message());
+
+			if (delegate_conection_reset_by_peer != nullptr) {
+				delegate_conection_reset_by_peer(shared_from_this());
+			}
+
+			/*
 			if (ec == boost::asio::error::eof)
 			{
 				NETWORK_MESSAGE("boost::asio::error::eof");
@@ -121,21 +128,16 @@ protected:
 			{
 
 				NETWORK_MESSAGE("boost::asio::error::operation_aborted");
-				/*	if (mErrorEventHandler != nullptr) {
-				mErrorEventHandler(err.message(), bytesTransferred);
+				if (delegate_conection_reset_by_peer != nullptr) {
+					delegate_conection_reset_by_peer(shared_from_this());
 				}
-				*/
-
-				std::cout << "boost::asio::error::operation_aborted" << std::endl;
 			}
-			else
+			else if (ec == boost::asio::error::connection_aborted)
 			{
-				NETWORK_MESSAGE("Error Value : " << ec.value());
+				NETWORK_MESSAGE("boost::asio::error::connection_aborted");
 			}
+			*/
 
-			NETWORK_MESSAGE(" - " << ec.message());
-			std::cout << std::endl;
-			//error callback...
 		}
 		else
 		{
@@ -156,12 +158,12 @@ protected:
 		}
 	}
 
-		
+	
 
 	void do_write() {
 
 		boost::asio::async_write(_socket, write_queue.front(),
-			strand_write.wrap(boost::bind(
+			mStrand.wrap(boost::bind(
 				&AsyncTcpSessionInterface::__handler_write,
 				shared_from_this(),
 				boost::asio::placeholders::error,
@@ -199,6 +201,15 @@ protected:
 	{
 		if (ec)
 		{
+			NETWORK_MESSAGE("Error Value : " << ec.value());
+			NETWORK_MESSAGE("Error Message : " << ec.message());
+
+			if (delegate_conection_reset_by_peer != nullptr) {
+				delegate_conection_reset_by_peer(shared_from_this());
+			}
+
+			/*
+
 			if (ec == boost::asio::error::eof )
 			{
 				NETWORK_MESSAGE("boost::asio::error::eof");
@@ -209,24 +220,25 @@ protected:
 			else if (ec == boost::asio::error::connection_reset)
 			{
 				NETWORK_MESSAGE("boost::asio::error::connection_reset");
-				if (delegate_conection_reset_by_peer != nullptr) {
-					delegate_conection_reset_by_peer(shared_from_this());
-				}
+
 			}
 			else if (ec == boost::asio::error::operation_aborted)
 			{
 				NETWORK_MESSAGE("boost::asio::error::operation_aborted");
-				/*
-				if (mErrorEventHandler != nullptr) {
-				mErrorEventHandler(err.message(), bytesTransferred);
+				if (delegate_conection_reset_by_peer != nullptr) {
+					delegate_conection_reset_by_peer(shared_from_this());
 				}
-				*/
 			}
-			else
+			else if (ec == boost::asio::error::connection_aborted)
 			{
-				NETWORK_MESSAGE("Error Value : " << ec.value());
+				NETWORK_MESSAGE("boost::asio::error::connection_aborted");
+				if (delegate_conection_reset_by_peer != nullptr) {
+					delegate_conection_reset_by_peer(shared_from_this());
+				}
 			}
-			NETWORK_MESSAGE(" - " << ec.message());
+			*/
+			
+
 		}
 		else
 		{
@@ -261,8 +273,9 @@ protected :
 	std::string					remote_address;
 	uint16_t					remote_port_number;
 	boost::asio::ip::tcp::socket _socket;
-	boost::asio::io_service::strand	strand_recv;
-	boost::asio::io_service::strand	strand_write;
+	//boost::asio::io_service::strand	strand_recv;
+	//boost::asio::io_service::strand	strand_write;
+	boost::asio::io_service::strand	mStrand;
 	std::deque<shared_const_buffer> write_queue;
 
 	void __error_handler(const std::string function, boost::system::error_code& ec)

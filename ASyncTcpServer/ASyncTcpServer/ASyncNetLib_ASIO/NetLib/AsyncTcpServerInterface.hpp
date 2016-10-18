@@ -91,33 +91,33 @@ protected:
 		using boost::asio::ip::tcp;
 		boost::system::error_code error;
 		mIoService.reset();  // this allows repeated cycles of run -> stop ->
-						   // run
+		// run
 		tcp::resolver resolver(mIoService);
 		tcp::resolver::query query(address_, server_port_number);
 		tcp::resolver::iterator endpoint_iterator = resolver.resolve(query, error);
 		if (error) {
-			NETWORK_MESSAGE("Error resolving '" << address_ << ':' << server_port_number);
-			return;
+		NETWORK_MESSAGE("Error resolving '" << address_ << ':' << server_port_number);
+		return;
 		}
 		tcp::endpoint endpoint = *endpoint_iterator;
 		mAcceptor.open(endpoint.protocol(), error);
 		if (error) {
-			NETWORK_MESSAGE("Error opening socket: " << address_ << ":"
-				<< server_port_number);
-			return;
+		NETWORK_MESSAGE("Error opening socket: " << address_ << ":"
+		<< server_port_number);
+		return;
 		}
 		socket_options_base::acceptor_options(mAcceptor);
 		mAcceptor.bind(endpoint, error);
 		if (error) {
-			NETWORK_MESSAGE("Error binding socket: " << address_ << ":"
-				<< server_port_number);
-			return;
+		NETWORK_MESSAGE("Error binding socket: " << address_ << ":"
+		<< server_port_number);
+		return;
 		}
 		mAcceptor.listen(boost::asio::socket_base::max_connections, error);
 		if (error) {
-			NETWORK_MESSAGE("Error listening on socket: '"
-				<< error << "' on " << address_ << ":" << server_port_number);
-			return;
+		NETWORK_MESSAGE("Error listening on socket: '"
+		<< error << "' on " << address_ << ":" << server_port_number);
+		return;
 		}
 		new_connection.reset(new connection(mIoService, handler, *thread_pool, ctx_));
 		*/
@@ -166,15 +166,15 @@ protected:
 		/*
 		mAcceptor.async_accept(session->Socket(), [this, session](boost::system::error_code ec)
 		{
-			if (!ec)
-			{
-				//AsyncTcpSessionInterface_ptr session = std::make_shared<AsyncTcpSessionInterface>(std::move(mSocket));
-				//AsyncTcpSessionInterface_ptr session = AsyncTcpSessionInterface::create(std::move(mSocket));
-				session->delegate_conection_reset_by_peer = std::move(std::bind(&AsyncTcpServerInterface::on_connection_reset_by_peer, this, std::placeholders::_1));
+		if (!ec)
+		{
+		//AsyncTcpSessionInterface_ptr session = std::make_shared<AsyncTcpSessionInterface>(std::move(mSocket));
+		//AsyncTcpSessionInterface_ptr session = AsyncTcpSessionInterface::create(std::move(mSocket));
+		session->delegate_conection_reset_by_peer = std::move(std::bind(&AsyncTcpServerInterface::on_connection_reset_by_peer, this, std::placeholders::_1));
 
 		mConnectionManager.begin(session);
-				do_accept();
-			}
+		do_accept();
+		}
 		});
 		*/
 
@@ -185,7 +185,7 @@ protected:
 		scoped_mutex_lock stopping_lock(stopping_mutex_);
 		if (stopping)
 			mIoService.stop();  // a user may have started listening again before
-							  // the stop command is reached
+								// the stop command is reached
 
 		mConnectionManager.stop_all();
 	}
